@@ -34,7 +34,10 @@
     "test-all": "yarn lint && yarn ts && yarn build && yarn test && yarn build-e2e && yarn test-e2e",
     "test-e2e": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe --live electron:./app ./test/e2e/HomePage.e2e.ts",
-    "test-watch": "yarn test --watch"
+    "test-watch": "yarn test --watch",
+    "web-dev": "webpack-dev-server --open --config configs/webpack.config.web.dev.js",
+    "web-build": "webpack --config configs/webpack.config.web.prod.js",
+    "web-start": "serve -s webdist"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -238,6 +241,7 @@
     "eslint-plugin-testcafe": "^0.2.1",
     "fbjs-scripts": "^1.2.0",
     "file-loader": "^5.0.2",
+    "html-webpack-plugin": "^4.3.0",
     "husky": "^4.2.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^25.1.0",
@@ -251,6 +255,7 @@
     "redux-logger": "^3.0.6",
     "rimraf": "^3.0.0",
     "sass-loader": "^8.0.2",
+    "serve": "^11.3.0",
     "sinon": "^8.1.1",
     "spectron": "^10.0.0",
     "style-loader": "^1.1.3",

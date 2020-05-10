@@ -43,6 +43,8 @@ dll
 main.js
 main.js.map
 
+webdist/
+
 .idea
 npm-debug.log.*
 *.css.d.ts
