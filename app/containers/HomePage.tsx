@@ -16,9 +16,13 @@ type headersHooks = [
 
 const initialHeaders: CompleteHeader[] = [];
 
+const methods = ['GET', 'POST', 'DELETE', 'PUT'];
+
 export default function HomePage() {
   const [headers, setHeaders]: headersHooks = useImmer(initialHeaders);
   const [response, setResponse] = useState('');
+  const [selectedMethod, setSelectedMethod] = React.useState(methods[0]);
+
   const handleAddHeader = (header: HeaderType) => {
     setHeaders(draft => {
       draft.push({ ...header, id: uuidv4() });
@@ -39,7 +43,12 @@ export default function HomePage() {
   };
   return (
     <div>
-      <URLForm handleMakeAPICall={handleMakeAPICall} />
+      <URLForm
+        methods={methods}
+        selectedMethod={selectedMethod}
+        handleMakeAPICall={handleMakeAPICall}
+        setSelectedMethod={setSelectedMethod}
+      />
       <Headers headers={headers} handleAddHeader={handleAddHeader} />
       <Editor value={response} handleChangeEditorValue={handleEditResponse} />
     </div>

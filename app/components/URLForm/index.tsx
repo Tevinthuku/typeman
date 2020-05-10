@@ -1,57 +1,112 @@
-import React, { useState } from 'react';
-
+import React from 'react';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Menu from '@material-ui/core/Menu';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Popper from '@material-ui/core/Popper';
+import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
-
-const methods = ['GET', 'POST', 'DELETE', 'PUT'];
 
 type URLFormProps = {
   handleMakeAPICall: () => void;
+  methods: string[];
+  setSelectedMethod: React.Dispatch<React.SetStateAction<string>>;
+  selectedMethod: string;
 };
 
-export default function URLForm({ handleMakeAPICall }: URLFormProps) {
-  const [method, setMethod] = useState('GET');
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+export default function URLForm({
+  handleMakeAPICall,
+  methods,
+  setSelectedMethod,
+  selectedMethod
+}: URLFormProps) {
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleClick = () => {};
+
+  const handleMenuItemClick = (
+    _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    method: string
+  ) => {
+    setSelectedMethod(method);
+    setOpen(false);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleToggle = () => {
+    setOpen(prevOpen => !prevOpen);
   };
 
-  const handleSelectMethod = (method: string) => () => {
-    setMethod(method);
-    handleClose();
+  const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
+    if (
+      anchorRef.current &&
+      anchorRef.current.contains(event.target as HTMLElement)
+    ) {
+      return;
+    }
+
+    setOpen(false);
   };
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
       <Grid item>
-        <Button
-          aria-controls="simple-menu"
-          aria-haspopup="true"
-          onClick={handleClick}
+        <ButtonGroup
+          variant="contained"
+          color="primary"
+          ref={anchorRef}
+          aria-label="split button"
         >
-          {method}
-        </Button>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
+          <Button onClick={handleClick}>{selectedMethod}</Button>
+          <Button
+            color="primary"
+            size="small"
+            aria-controls={open ? 'split-button-menu' : undefined}
+            aria-expanded={open ? 'true' : undefined}
+            aria-label="select merge strategy"
+            aria-haspopup="menu"
+            onClick={handleToggle}
+          >
+            <ArrowDropDownIcon />
+          </Button>
+        </ButtonGroup>
+        <Popper
+          open={open}
+          anchorEl={anchorRef.current}
+          role={undefined}
+          transition
+          disablePortal
         >
-          {methods.map(method => (
-            <MenuItem key={method} onClick={handleSelectMethod(method)}>
-              {method}
-            </MenuItem>
-          ))}
-        </Menu>
+          {({ TransitionProps, placement }) => (
+            <Grow
+              {...TransitionProps}
+              style={{
+                transformOrigin:
+                  placement === 'bottom' ? 'center top' : 'center bottom'
+              }}
+            >
+              <Paper>
+                <ClickAwayListener onClickAway={handleClose}>
+                  <MenuList id="split-button-menu">
+                    {methods.map(method => (
+                      <MenuItem
+                        key={method}
+                        selected={selectedMethod === method}
+                        onClick={event => handleMenuItemClick(event, method)}
+                      >
+                        {method}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
       </Grid>
       <Grid item>
         <TextField
