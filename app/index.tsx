@@ -5,7 +5,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
-import './app.global.css';
 
 import theme from './constants/theme';
 

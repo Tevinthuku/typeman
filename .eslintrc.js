@@ -1,13 +1,5 @@
 module.exports = {
-  extends: 'erb/typescript',
-  rules: {
-    // A temporary hack related to IDE not resolving correct package.json
-    'import/no-extraneous-dependencies': 'off',
-    'no-param-reassign': [
-      'error',
-      { props: true, ignorePropertyModificationsFor: ['draft'] }
-    ]
-  },
+  extends: 'react-app',
   settings: {
     'import/resolver': {
       // See https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below
