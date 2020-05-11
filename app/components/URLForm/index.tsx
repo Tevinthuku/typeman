@@ -11,18 +11,26 @@ import Popper from '@material-ui/core/Popper';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 
+// types
+import { Method } from 'axios';
+import { axiosObject } from '../../types/request';
+
 type URLFormProps = {
+  axiosObject: axiosObject;
   handleMakeAPICall: () => void;
-  methods: string[];
-  setSelectedMethod: React.Dispatch<React.SetStateAction<string>>;
+  methods: Method[];
+  setSelectedMethod: React.Dispatch<React.SetStateAction<Method>>;
   selectedMethod: string;
+  handleURLChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function URLForm({
   handleMakeAPICall,
   methods,
   setSelectedMethod,
-  selectedMethod
+  selectedMethod,
+  handleURLChange,
+  axiosObject
 }: URLFormProps) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
@@ -31,7 +39,7 @@ export default function URLForm({
 
   const handleMenuItemClick = (
     _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    method: string
+    method: Method
   ) => {
     setSelectedMethod(method);
     setOpen(false);
@@ -111,6 +119,8 @@ export default function URLForm({
       <Grid item>
         <TextField
           fullWidth
+          value={axiosObject.url}
+          onChange={handleURLChange}
           id="outlined-basic"
           label="Type in the URL"
           variant="outlined"
