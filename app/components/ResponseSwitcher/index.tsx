@@ -2,7 +2,6 @@ import React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
 import Editor from '../Editor';
@@ -24,11 +23,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box p={3}>{children}</Box>}
     </div>
   );
 }
@@ -55,6 +50,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 type Props = {
   typeResponse: string;
   dataResponse: string;
+  handleEditCode: (
+    type: 'dataResponse' | 'typeResponse'
+  ) => (s: string) => void;
 };
 
 export default function ResponseSwitcher(props: Props) {
@@ -81,13 +79,13 @@ export default function ResponseSwitcher(props: Props) {
       <TabPanel value={value} index={0}>
         <Editor
           value={props.typeResponse}
-          handleChangeEditorValue={code => {}}
+          handleChangeEditorValue={props.handleEditCode('typeResponse')}
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <Editor
           value={props.dataResponse}
-          handleChangeEditorValue={code => {}}
+          handleChangeEditorValue={props.handleEditCode('dataResponse')}
         />
       </TabPanel>
     </div>

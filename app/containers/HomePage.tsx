@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useImmer } from 'use-immer';
+import { Draft } from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 
 import { json2ts } from 'json-ts';
@@ -14,12 +15,12 @@ import { axiosObject } from '../types/request';
 
 type headersHooks = [
   CompleteHeader[],
-  (f: (draft: CompleteHeader[]) => void | CompleteHeader[]) => void
+  (f: (draft: Draft<CompleteHeader[]>) => void | CompleteHeader[]) => void
 ];
 
 type axiosHook = [
   axiosObject,
-  (f: (draft: axiosObject) => void | axiosObject) => void
+  (f: (draft: Draft<axiosObject>) => void | axiosObject) => void
 ];
 
 const initialHeaders: CompleteHeader[] = [];
@@ -56,7 +57,7 @@ type requestStateMachine =
 
 type RequestStateMachineHook = [
   requestStateMachine,
-  (f: (draft: requestStateMachine) => void | requestStateMachine) => void
+  (f: (draft: Draft<requestStateMachine>) => void | requestStateMachine) => void
 ];
 
 const initialRequestState: requestStateMachine = {
@@ -65,7 +66,6 @@ const initialRequestState: requestStateMachine = {
 
 export default function HomePage() {
   const [headers, setHeaders]: headersHooks = useImmer(initialHeaders);
-  const [response, setResponse] = useState('');
   const [selectedMethod, setSelectedMethod] = React.useState(methods[0]);
   const [axiosObject, setAxiosObject]: axiosHook = useImmer(
     initialAxiosRequest
@@ -78,10 +78,6 @@ export default function HomePage() {
     setHeaders(draft => {
       draft.push({ ...header, id: uuidv4() });
     });
-  };
-
-  const handleEditResponse = (anotation: string) => {
-    setResponse(anotation);
   };
 
   const handleURLChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +101,13 @@ export default function HomePage() {
     });
   };
 
+  const handleEditCode = (type: 'dataResponse' | 'typeResponse') => (
+    code: string
+  ) => {
+    setRequestState(draft => {
+      if (draft.status === 'resolved') draft[type] = code;
+    });
+  };
   useEffect(() => {
     if (requestState.status === 'request') {
       async function loadData() {
@@ -112,14 +115,16 @@ export default function HomePage() {
           const data = await Axios(axiosObject);
           setRequestState(() => ({
             status: 'resolved',
-            typeResponse: json2ts(JSON.stringify(data), { flow: true }),
-            dataResponse: JSON.stringify(data)
+            typeResponse: json2ts(JSON.stringify(data, null, 2), {
+              flow: true
+            }),
+            dataResponse: JSON.stringify(data, null, 2)
           }));
         } catch (err) {
           setRequestState(() => ({
             status: 'rejected',
-            typeResponse: json2ts(JSON.stringify(err), { flow: true }),
-            dataResponse: JSON.stringify(err)
+            typeResponse: json2ts(JSON.stringify(err, null, 2), { flow: true }),
+            dataResponse: JSON.stringify(err, null, 2)
           }));
         }
       }
@@ -141,6 +146,7 @@ export default function HomePage() {
       {(requestState.status === 'rejected' ||
         requestState.status === 'resolved') && (
         <ResponseSwitcher
+          handleEditCode={handleEditCode}
           typeResponse={requestState.typeResponse}
           dataResponse={requestState.dataResponse}
         />
