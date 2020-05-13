@@ -3,6 +3,10 @@ import { useImmer } from 'use-immer';
 import { Draft } from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
 import { json2ts } from 'json-ts';
 import Axios, { Method } from 'axios';
 
@@ -70,10 +74,15 @@ export default function HomePage() {
   const [axiosObject, setAxiosObject]: axiosHook = useImmer(
     initialAxiosRequest
   );
-
   const [requestState, setRequestState]: RequestStateMachineHook = useImmer(
     initialRequestState
   );
+  const [requestOption, setRequestOption] = React.useState(0);
+
+  const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+    setRequestOption(newValue);
+  };
+
   const handleAddHeader = (header: HeaderType) => {
     setHeaders(draft => {
       draft.push({ ...header, id: uuidv4() });
@@ -142,7 +151,24 @@ export default function HomePage() {
         handleMakeAPICall={handleMakeAPICall}
         setSelectedMethod={setSelectedMethod}
       />
-      <Headers headers={headers} handleAddHeader={handleAddHeader} />
+
+      <Paper square>
+        <Tabs
+          value={requestOption}
+          indicatorColor="primary"
+          textColor="primary"
+          onChange={handleChange}
+          aria-label="disabled tabs example"
+        >
+          <Tab label="Headers" />
+          <Tab label="Params" />
+          <Tab label="Body" />
+        </Tabs>
+      </Paper>
+      {requestOption === 0 && (
+        <Headers headers={headers} handleAddHeader={handleAddHeader} />
+      )}
+      {requestOption === 1 && <div />}
       {(requestState.status === 'rejected' ||
         requestState.status === 'resolved') && (
         <ResponseSwitcher
