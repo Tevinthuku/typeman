@@ -40,7 +40,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
-    height: 224
+    height: 224,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`
@@ -72,6 +74,7 @@ export default function ResponseSwitcher(props: Props) {
         onChange={handleChange}
         aria-label="Vertical tabs example"
         className={classes.tabs}
+        
       >
         <Tab label="Types" {...a11yProps(0)} />
         <Tab label="Data" {...a11yProps(1)} />

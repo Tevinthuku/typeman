@@ -4,5 +4,6 @@ export type axiosObject = {
   url: string;
   method: Method;
   headers: Record<string, string | number>;
-  body: Object;
+  data: Object;
+  params: Record<string, string | number>;
 };

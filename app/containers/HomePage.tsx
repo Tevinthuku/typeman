@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { Draft } from 'immer';
 import { v4 as uuidv4 } from 'uuid';
-
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import IconButton from '@material-ui/core/IconButton';
 
 import { json2ts } from 'json-ts';
 import Axios, { Method } from 'axios';
 
-import Headers, { HeaderType, CompleteHeader } from '../components/Header';
+import {
+  CompleteItem,
+  HeaderType,
+  supportedDataTypes,
+  HeaderItemType
+} from '../components/FieldsContainer';
+import Headers from '../components/Header';
+import Params from '../components/Params';
 import URLForm from '../components/URLForm';
+import Editor from '../components/Editor';
 import ResponseSwitcher from '../components/ResponseSwitcher';
+
+import Lambda from '../components/LambdaIcon';
 
 // types
 import { axiosObject } from '../types/request';
+import { makeStyles } from '@material-ui/core';
 
 type headersHooks = [
-  CompleteHeader[],
-  (f: (draft: Draft<CompleteHeader[]>) => void | CompleteHeader[]) => void
+  CompleteItem[],
+  (f: (draft: Draft<CompleteItem[]>) => void | CompleteItem[]) => void
 ];
 
 type axiosHook = [
@@ -27,7 +41,7 @@ type axiosHook = [
   (f: (draft: Draft<axiosObject>) => void | axiosObject) => void
 ];
 
-const initialHeaders: CompleteHeader[] = [];
+const initialHeaders: CompleteItem[] = [];
 
 const methods: Method[] = ['GET', 'POST', 'DELETE', 'PUT'];
 
@@ -35,7 +49,8 @@ const initialAxiosRequest = {
   url: 'https://jsonplaceholder.typicode.com/posts/1',
   method: methods[0],
   headers: {},
-  body: {}
+  data: {},
+  params: {}
 };
 
 type requestStateMachine =
@@ -68,8 +83,25 @@ const initialRequestState: requestStateMachine = {
   status: 'idle'
 };
 
+function convertStringToNumber(str: string): string | number {
+  if (/^[-+]?(\d+|Infinity)$/.test(str)) {
+    return Number(str);
+  } else {
+    return str;
+  }
+}
+
+const useStyles = makeStyles(theme => ({
+  urlToolbar: {
+    backgroundColor: theme.palette.background.paper,
+    paddingBottom: theme.spacing(1)
+  }
+}));
+
 export default function HomePage() {
   const [headers, setHeaders]: headersHooks = useImmer(initialHeaders);
+  const [params, setParams]: headersHooks = useImmer(initialHeaders);
+  const [body, setBody] = useState('');
   const [selectedMethod, setSelectedMethod] = React.useState(methods[0]);
   const [axiosObject, setAxiosObject]: axiosHook = useImmer(
     initialAxiosRequest
@@ -78,7 +110,7 @@ export default function HomePage() {
     initialRequestState
   );
   const [requestOption, setRequestOption] = React.useState(0);
-
+  const classes = useStyles();
   const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
     setRequestOption(newValue);
   };
@@ -86,6 +118,12 @@ export default function HomePage() {
   const handleAddHeader = (header: HeaderType) => {
     setHeaders(draft => {
       draft.push({ ...header, id: uuidv4() });
+    });
+  };
+
+  const handleAddParam = (param: HeaderType) => {
+    setHeaders(draft => {
+      draft.push({ ...param, id: uuidv4() });
     });
   };
 
@@ -102,7 +140,24 @@ export default function HomePage() {
     });
     setAxiosObject(draft => {
       for (let i = 0; i < headers.length; i++)
-        draft.headers[headers[i].key] = headers[i].value;
+        draft.headers[headers[i].key] =
+          headers[i].type === 'number'
+            ? convertStringToNumber(headers[i].value)
+            : String(headers[i].value);
+    });
+    setAxiosObject(draft => {
+      for (let i = 0; i < params.length; i++)
+        draft.params[params[i].key] =
+          params[i].type === 'number'
+            ? convertStringToNumber(params[i].value)
+            : String(params[i].value);
+    });
+
+    setAxiosObject(draft => {
+      try {
+        draft.data = JSON.parse(body);
+      } catch (err) {}
+      draft.method = selectedMethod;
     });
 
     setRequestState(draft => {
@@ -125,14 +180,19 @@ export default function HomePage() {
           setRequestState(() => ({
             status: 'resolved',
             typeResponse: json2ts(JSON.stringify(data, null, 2), {
-              flow: true
+              flow: true,
+              prefix: ''
             }),
             dataResponse: JSON.stringify(data, null, 2)
           }));
-        } catch (err) {
+        } catch (error) {
+          const err = error.response || error;
           setRequestState(() => ({
             status: 'rejected',
-            typeResponse: json2ts(JSON.stringify(err, null, 2), { flow: true }),
+            typeResponse: json2ts(JSON.stringify(err, null, 2), {
+              flow: true,
+              prefix: ''
+            }),
             dataResponse: JSON.stringify(err, null, 2)
           }));
         }
@@ -141,16 +201,81 @@ export default function HomePage() {
     }
   }, [requestState.status, axiosObject, setRequestState]);
 
+  const handleEditHeaderItem = (id: string) => (
+    prop: 'key' | 'value' | 'type'
+  ) => (value: string | HeaderItemType) => {
+    setHeaders(draft => {
+      if (prop === 'type') {
+        if (
+          supportedDataTypes[0] === value ||
+          supportedDataTypes[1] === value
+        ) {
+          const itemToBeEdited = draft.find(d => d.id === id);
+          if (itemToBeEdited) itemToBeEdited[prop] = value;
+        }
+      } else {
+        const itemToBeEdited = draft.find(d => d.id === id);
+        if (itemToBeEdited) itemToBeEdited[prop] = value;
+      }
+    });
+  };
+  const handleEditParam = (id: string) => (prop: 'key' | 'value' | 'type') => (
+    value: string | HeaderItemType
+  ) => {
+    setParams(draft => {
+      if (prop === 'type') {
+        if (
+          supportedDataTypes[0] === value ||
+          supportedDataTypes[1] === value
+        ) {
+          const itemToBeEdited = draft.find(d => d.id === id);
+          if (itemToBeEdited) itemToBeEdited[prop] = value;
+        }
+      } else {
+        const itemToBeEdited = draft.find(d => d.id === id);
+        if (itemToBeEdited) itemToBeEdited[prop] = value;
+      }
+    });
+  };
+
+  const handleDeleteHeader = (id: string) => () => {
+    setHeaders(draft => {
+      draft.splice(
+        draft.findIndex(header => header.id === id),
+        1
+      );
+    });
+  };
+
+  const handleDeleteParam = (id: string) => () => {
+    setParams(draft => {
+      draft.splice(
+        draft.findIndex(header => header.id === id),
+        1
+      );
+    });
+  };
+
   return (
     <div>
-      <URLForm
-        axiosObject={axiosObject}
-        handleURLChange={handleURLChange}
-        methods={methods}
-        selectedMethod={selectedMethod}
-        handleMakeAPICall={handleMakeAPICall}
-        setSelectedMethod={setSelectedMethod}
-      />
+      <AppBar position="sticky">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <Lambda />
+          </IconButton>
+          <Typography variant="h6">Typeman</Typography>
+        </Toolbar>
+      </AppBar>
+      <AppBar elevation={2} className={classes.urlToolbar} position="sticky">
+        <URLForm
+          axiosObject={axiosObject}
+          handleURLChange={handleURLChange}
+          methods={methods}
+          selectedMethod={selectedMethod}
+          handleMakeAPICall={handleMakeAPICall}
+          setSelectedMethod={setSelectedMethod}
+        />
+      </AppBar>
 
       <Paper square>
         <Tabs
@@ -166,17 +291,40 @@ export default function HomePage() {
         </Tabs>
       </Paper>
       {requestOption === 0 && (
-        <Headers headers={headers} handleAddHeader={handleAddHeader} />
-      )}
-      {requestOption === 1 && <div />}
-      {(requestState.status === 'rejected' ||
-        requestState.status === 'resolved') && (
-        <ResponseSwitcher
-          handleEditCode={handleEditCode}
-          typeResponse={requestState.typeResponse}
-          dataResponse={requestState.dataResponse}
+        <Headers
+          handleDeleteHeader={handleDeleteHeader}
+          headers={headers}
+          handleEditHeaderItem={handleEditHeaderItem}
+          handleAddHeader={handleAddHeader}
         />
       )}
+      {requestOption === 1 && (
+        <Params
+          handleEditParam={handleEditParam}
+          handleAddParam={handleAddParam}
+          params={params}
+          handleDeleteParam={handleDeleteParam}
+        />
+      )}
+      {requestOption === 2 && (
+        <Editor height="200px" value={body} handleChangeEditorValue={setBody} />
+      )}
+
+      <ResponseSwitcher
+        handleEditCode={handleEditCode}
+        typeResponse={
+          requestState.status === 'resolved' ||
+          requestState.status === 'rejected'
+            ? requestState.typeResponse
+            : ''
+        }
+        dataResponse={
+          requestState.status === 'resolved' ||
+          requestState.status === 'rejected'
+            ? requestState.dataResponse
+            : ''
+        }
+      />
     </div>
   );
 }

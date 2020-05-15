@@ -1,15 +1,14 @@
 import React from 'react';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
+
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Popper from '@material-ui/core/Popper';
+
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
+import { makeStyles } from '@material-ui/core/styles';
+
+import ButtonGroupComponent from '../ButtonGroup';
 
 // types
 import { Method } from 'axios';
@@ -24,6 +23,18 @@ type URLFormProps = {
   handleURLChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
+const useStyles = makeStyles(theme => ({
+  container: {
+    marginTop: theme.spacing(2)
+  },
+  input: {
+    width: '100%'
+  },
+  submitButton: {
+    marginLeft: '10px'
+  }
+}));
+
 export default function URLForm({
   handleMakeAPICall,
   methods,
@@ -32,92 +43,43 @@ export default function URLForm({
   handleURLChange,
   axiosObject
 }: URLFormProps) {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-
-  const handleClick = () => {};
+  const classes = useStyles();
 
   const handleMenuItemClick = (
-    _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    handleOpenMenu: React.Dispatch<React.SetStateAction<boolean>>,
     method: Method
   ) => {
     setSelectedMethod(method);
-    setOpen(false);
-  };
-
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
-  };
-
-  const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-
-    setOpen(false);
+    handleOpenMenu(false);
   };
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center">
-      <Grid item>
-        <ButtonGroup
-          variant="contained"
-          color="primary"
-          ref={anchorRef}
-          aria-label="split button"
-        >
-          <Button onClick={handleClick}>{selectedMethod}</Button>
-          <Button
-            color="primary"
-            size="small"
-            aria-controls={open ? 'split-button-menu' : undefined}
-            aria-expanded={open ? 'true' : undefined}
-            aria-label="select merge strategy"
-            aria-haspopup="menu"
-            onClick={handleToggle}
-          >
-            <ArrowDropDownIcon />
-          </Button>
-        </ButtonGroup>
-        <Popper
-          open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          transition
-          disablePortal
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin:
-                  placement === 'bottom' ? 'center top' : 'center bottom'
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList id="split-button-menu">
-                    {methods.map(method => (
-                      <MenuItem
-                        key={method}
-                        selected={selectedMethod === method}
-                        onClick={event => handleMenuItemClick(event, method)}
-                      >
-                        {method}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
+    <Grid
+      className={classes.container}
+      alignItems="center"
+      justify="center"
+      container
+    >
+      <Grid item xs={3} md={2}>
+        <ButtonGroupComponent itemSelected={selectedMethod}>
+          {handleClose => (
+            <MenuList id="split-button-menu">
+              {methods.map(method => (
+                <MenuItem
+                  key={method}
+                  selected={selectedMethod === method}
+                  onClick={() => handleMenuItemClick(handleClose, method)}
+                >
+                  {method}
+                </MenuItem>
+              ))}
+            </MenuList>
           )}
-        </Popper>
+        </ButtonGroupComponent>
       </Grid>
-      <Grid item>
+      <Grid item xs={6} md={8}>
         <TextField
+          className={classes.input}
           fullWidth
           value={axiosObject.url}
           onChange={handleURLChange}
@@ -126,8 +88,15 @@ export default function URLForm({
           variant="outlined"
         />
       </Grid>
-      <Grid item>
-        <Button onClick={handleMakeAPICall}>Run</Button>
+      <Grid item xs={3} md={2}>
+        <Button
+          className={classes.submitButton}
+          color="primary"
+          variant="contained"
+          onClick={handleMakeAPICall}
+        >
+          Send
+        </Button>
       </Grid>
     </Grid>
   );

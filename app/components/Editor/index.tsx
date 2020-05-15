@@ -8,15 +8,18 @@ type EditorType = {
   value: string;
   handleChangeEditorValue: (code: string) => void;
   theme?: string;
+  height?: string;
 };
 
 export default function Editor({
   value,
   handleChangeEditorValue,
-  theme = 'xcode'
+  theme = 'xcode',
+  height = '500px'
 }: EditorType) {
   return (
     <AceEditor
+      height={height}
       value={value}
       mode="typescript"
       theme={theme}

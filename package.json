@@ -35,7 +35,7 @@
     "test-e2e": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe --live electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-watch": "yarn test --watch",
-    "web-dev": "webpack-dev-server --open --config configs/webpack.config.web.dev.js",
+    "web-dev": "cross-env NODE_ENV=development webpack-dev-server --open --config configs/webpack.config.web.dev.js",
     "web-build": "webpack --config configs/webpack.config.web.prod.js",
     "web-start": "serve -s webdist"
   },
