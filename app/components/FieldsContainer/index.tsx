@@ -26,15 +26,17 @@ import ButtonGroupComponent, {
 export type HeaderItemType = 'string' | 'number';
 export type HeaderType = { key: string; value: string; type: HeaderItemType };
 
-export type CompleteItem = {
-  key: string;
-  value: string;
-  id: string;
-  type: HeaderItemType;
+export type IDObjectItem = {
+  [S in string]: {
+    key: string;
+    value: string;
+    id: string;
+    type: HeaderItemType;
+  };
 };
 
 type Props = {
-  items: CompleteItem[];
+  items: IDObjectItem;
   handleAddItem: (h: HeaderType) => void;
   handleEditItem: (
     id: string
@@ -167,7 +169,7 @@ export default function FieldsContainer({
                 </Grid>
               </TableCell>
             </TableRow>
-            {items.map(row => (
+            {Object.values(items).map(row => (
               <TableRow key={row.id}>
                 <TableCell align="center">
                   <TextField

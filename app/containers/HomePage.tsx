@@ -14,7 +14,7 @@ import { json2ts } from 'json-ts';
 import Axios, { Method } from 'axios';
 
 import {
-  CompleteItem,
+  IDObjectItem,
   HeaderType,
   supportedDataTypes,
   HeaderItemType
@@ -32,8 +32,8 @@ import { axiosObject } from '../types/request';
 import { makeStyles } from '@material-ui/core';
 
 type headersHooks = [
-  CompleteItem[],
-  (f: (draft: Draft<CompleteItem[]>) => void | CompleteItem[]) => void
+  IDObjectItem,
+  (f: (draft: Draft<IDObjectItem>) => void | IDObjectItem) => void
 ];
 
 type axiosHook = [
@@ -41,7 +41,7 @@ type axiosHook = [
   (f: (draft: Draft<axiosObject>) => void | axiosObject) => void
 ];
 
-const initialHeaders: CompleteItem[] = [];
+const initialHeaders: IDObjectItem = {};
 
 const methods: Method[] = ['GET', 'POST', 'DELETE', 'PUT'];
 
@@ -117,13 +117,21 @@ export default function HomePage() {
 
   const handleAddHeader = (header: HeaderType) => {
     setHeaders(draft => {
-      draft.push({ ...header, id: uuidv4() });
+      const id = uuidv4();
+      draft[id] = {
+        ...header,
+        id: id
+      };
     });
   };
 
   const handleAddParam = (param: HeaderType) => {
     setHeaders(draft => {
-      draft.push({ ...param, id: uuidv4() });
+      const uniqueId = uuidv4();
+      draft[uniqueId] = {
+        ...param,
+        id: uniqueId
+      };
     });
   };
 
@@ -139,21 +147,21 @@ export default function HomePage() {
       draft.status = 'pending';
     });
     setAxiosObject(draft => {
-      for (let i = 0; i < headers.length; i++)
-        draft.headers[headers[i].key] =
-          headers[i].type === 'number'
-            ? convertStringToNumber(headers[i].value)
-            : String(headers[i].value);
-    });
-    setAxiosObject(draft => {
-      for (let i = 0; i < params.length; i++)
-        draft.params[params[i].key] =
-          params[i].type === 'number'
-            ? convertStringToNumber(params[i].value)
-            : String(params[i].value);
-    });
+      for (const header in headers) {
+        const key = headers[header].key;
+        draft.headers[key] =
+          headers[header].type === 'number'
+            ? convertStringToNumber(headers[header].value)
+            : String(headers[header].value);
+      }
+      for (const param in params) {
+        const key = params[param].key;
+        draft.params[key] =
+          params[param].type === 'number'
+            ? convertStringToNumber(params[param].value)
+            : String(params[param].value);
+      }
 
-    setAxiosObject(draft => {
       try {
         draft.data = JSON.parse(body);
       } catch (err) {}
@@ -210,11 +218,11 @@ export default function HomePage() {
           supportedDataTypes[0] === value ||
           supportedDataTypes[1] === value
         ) {
-          const itemToBeEdited = draft.find(d => d.id === id);
+          const itemToBeEdited = draft[id];
           if (itemToBeEdited) itemToBeEdited[prop] = value;
         }
       } else {
-        const itemToBeEdited = draft.find(d => d.id === id);
+        const itemToBeEdited = draft[id];
         if (itemToBeEdited) itemToBeEdited[prop] = value;
       }
     });
@@ -228,11 +236,11 @@ export default function HomePage() {
           supportedDataTypes[0] === value ||
           supportedDataTypes[1] === value
         ) {
-          const itemToBeEdited = draft.find(d => d.id === id);
+          const itemToBeEdited = draft[id];
           if (itemToBeEdited) itemToBeEdited[prop] = value;
         }
       } else {
-        const itemToBeEdited = draft.find(d => d.id === id);
+        const itemToBeEdited = draft[id];
         if (itemToBeEdited) itemToBeEdited[prop] = value;
       }
     });
@@ -240,19 +248,13 @@ export default function HomePage() {
 
   const handleDeleteHeader = (id: string) => () => {
     setHeaders(draft => {
-      draft.splice(
-        draft.findIndex(header => header.id === id),
-        1
-      );
+      delete draft[id];
     });
   };
 
   const handleDeleteParam = (id: string) => () => {
     setParams(draft => {
-      draft.splice(
-        draft.findIndex(header => header.id === id),
-        1
-      );
+      delete draft[id];
     });
   };
 

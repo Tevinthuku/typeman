@@ -1,10 +1,10 @@
 import React from 'react';
 
-import FieldsContainer, { CompleteItem, HeaderType } from '../FieldsContainer';
+import FieldsContainer, { IDObjectItem, HeaderType } from '../FieldsContainer';
 
 type Props = {
   handleAddHeader: (h: HeaderType) => void;
-  headers: CompleteItem[];
+  headers: IDObjectItem;
   handleEditHeaderItem: (
     id: string
   ) => (prop: 'key' | 'value' | 'type') => (value: string) => void;
