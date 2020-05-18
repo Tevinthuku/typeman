@@ -23,17 +23,12 @@ import ButtonGroupComponent, {
   handleCloseButtonGroupType
 } from '../ButtonGroup';
 
-export type HeaderItemType = 'string' | 'number';
-export type HeaderType = { key: string; value: string; type: HeaderItemType };
-
-export type IDObjectItem = {
-  [S in string]: {
-    key: string;
-    value: string;
-    id: string;
-    type: HeaderItemType;
-  };
-};
+import {
+  IDObjectItem,
+  HeaderType,
+  supportedDataTypes,
+  HeaderItemType
+} from '../../types/data';
 
 type Props = {
   items: IDObjectItem;
@@ -43,8 +38,6 @@ type Props = {
   ) => (prop: 'key' | 'value' | 'type') => (value: string) => void;
   handleDeleteItem: (id: string) => () => void;
 };
-
-export const supportedDataTypes: HeaderItemType[] = ['string', 'number'];
 
 type ItemTypeHook = [
   HeaderType,
@@ -159,6 +152,7 @@ export default function FieldsContainer({
                   </Grid>
                   <Grid item>
                     <Fab
+                      size="small"
                       onClick={handleAddNewItem}
                       color="primary"
                       aria-label="add"
@@ -224,6 +218,7 @@ export default function FieldsContainer({
                     </Grid>
                     <Grid item>
                       <Fab
+                        size="small"
                         color="primary"
                         style={{ background: 'red' }}
                         onClick={handleDeleteItem(row.id)}

@@ -8,5 +8,10 @@ module.exports = merge(baseConfig, {
     port: 4000,
     historyApiFallback: true
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
+  resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    }
+  }
 });

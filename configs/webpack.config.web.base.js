@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './app/index.tsx',
+  entry: './app/index.web.tsx',
   output: {
     path: path.join(__dirname, '../webdist'),
     filename: 'app.bundle.js',

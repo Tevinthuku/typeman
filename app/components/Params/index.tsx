@@ -1,6 +1,7 @@
 import React from 'react';
 
-import FieldsContainer, { IDObjectItem, HeaderType } from '../FieldsContainer';
+import FieldsContainer from '../FieldsContainer';
+import { IDObjectItem, HeaderType } from '../../types/data';
 
 type Props = {
   handleAddParam: (h: HeaderType) => void;
