@@ -21,6 +21,9 @@ const useStyles = makeStyles(theme => ({
   urlToolbar: {
     backgroundColor: theme.palette.background.paper,
     paddingBottom: theme.spacing(1)
+  },
+  tabsRoot: {
+    backgroundColor: theme.palette.background.default
   }
 }));
 
@@ -62,7 +65,7 @@ export default function HomePage() {
         />
       </AppBar>
 
-      <Paper square>
+      <Paper square className={classes.tabsRoot}>
         <Tabs
           value={requestOption}
           indicatorColor="primary"
@@ -92,7 +95,12 @@ export default function HomePage() {
         />
       )}
       {requestOption === 2 && (
-        <Editor height="200px" value={body} handleChangeEditorValue={setBody} />
+        <Editor
+          height="200px"
+          width="100vw"
+          value={body}
+          handleChangeEditorValue={setBody}
+        />
       )}
 
       <ResponseSwitcher

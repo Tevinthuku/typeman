@@ -29,6 +29,7 @@ import {
   supportedDataTypes,
   HeaderItemType
 } from '../../types/data';
+import { makeStyles } from '@material-ui/core';
 
 type Props = {
   items: IDObjectItem;
@@ -49,6 +50,12 @@ const initialItem: HeaderType = {
   value: '',
   type: supportedDataTypes[0]
 };
+
+const useClasses = makeStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.background.default
+  }
+}));
 
 export default function FieldsContainer({
   handleAddItem,
@@ -91,10 +98,12 @@ export default function FieldsContainer({
     handleClose(false);
   };
 
+  const classes = useClasses();
+
   return (
-    <Grid container>
+    <Grid container className={classes.root}>
       <TableContainer component={Paper}>
-        <Table aria-label="simple table">
+        <Table aria-label="simple table" className={classes.root}>
           <TableHead>
             <TableRow>
               <TableCell align="center">Key</TableCell>

@@ -37,7 +37,7 @@ function a11yProps(index: any) {
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.default,
     display: 'flex',
     height: 224,
     marginTop: theme.spacing(2),
@@ -73,7 +73,6 @@ export default function ResponseSwitcher(props: Props) {
         onChange={handleChange}
         aria-label="Vertical tabs example"
         className={classes.tabs}
-
       >
         <Tab label="Types" {...a11yProps(0)} />
         <Tab label="Data" {...a11yProps(1)} />

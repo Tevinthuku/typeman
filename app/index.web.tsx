@@ -7,11 +7,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
-import theme from './constants/theme';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import Landing from './containers/LandingPage';
 import routes from './constants/webroutes.json';
+
+import useTheme from './hooks/useTheme';
 
 function Routes() {
   return (
@@ -24,13 +25,18 @@ function Routes() {
   );
 }
 
+function AppContainer() {
+  const theme = useTheme();
+
+  return (
+    <Router>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Routes />
+      </ThemeProvider>
+    </Router>
+  );
+}
+
 const root = document.getElementById('root');
-render(
-  <Router>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Routes />
-    </ThemeProvider>
-  </Router>,
-  root
-);
+render(<AppContainer />, root);
