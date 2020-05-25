@@ -13,6 +13,7 @@ import Editor from '../components/Editor';
 import ResponseSwitcher from '../components/ResponseSwitcher';
 
 import useRequest, { methods } from '../hooks/useRequest';
+import useTransform from '../hooks/useTransform';
 
 // types
 import { makeStyles } from '@material-ui/core';
@@ -34,7 +35,6 @@ export default function HomePage() {
     handleDeleteParam,
     handleEditParam,
     handleEditHeaderItem,
-    handleEditCode,
     handleMakeAPICall,
     handleURLChange,
     handleAddHeader,
@@ -49,6 +49,11 @@ export default function HomePage() {
     axiosObject,
     requestState
   } = useRequest();
+
+  const { transformState, handleEditCode } = useTransform({
+    requestState,
+    showDataOnly: true
+  });
 
   const classes = useStyles();
 
@@ -104,19 +109,9 @@ export default function HomePage() {
       )}
 
       <ResponseSwitcher
+        requestState={requestState}
         handleEditCode={handleEditCode}
-        typeResponse={
-          requestState.status === 'resolved' ||
-          requestState.status === 'rejected'
-            ? requestState.typeResponse
-            : ''
-        }
-        dataResponse={
-          requestState.status === 'resolved' ||
-          requestState.status === 'rejected'
-            ? requestState.dataResponse
-            : ''
-        }
+        transformState={transformState}
       />
     </div>
   );

@@ -3,7 +3,12 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+
 import Editor from '../Editor';
+import LoadingResults from '../Loading';
+
+import { TransformStateMachine } from '../../hooks/useTransform';
+import { requestStateMachine } from '../../hooks/useRequest';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -49,11 +54,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type Props = {
-  typeResponse: string;
-  dataResponse: string;
   handleEditCode: (
     type: 'dataResponse' | 'typeResponse'
   ) => (s: string) => void;
+  transformState: TransformStateMachine;
+  requestState: requestStateMachine;
 };
 
 export default function ResponseSwitcher(props: Props) {
@@ -77,18 +82,51 @@ export default function ResponseSwitcher(props: Props) {
         <Tab label="Types" {...a11yProps(0)} />
         <Tab label="Data" {...a11yProps(1)} />
       </Tabs>
-      <TabPanel value={value} index={0}>
-        <Editor
-          value={props.typeResponse}
-          handleChangeEditorValue={props.handleEditCode('typeResponse')}
-        />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Editor
-          value={props.dataResponse}
-          handleChangeEditorValue={props.handleEditCode('dataResponse')}
-        />
-      </TabPanel>
+
+      {props.requestState.status === 'idle' && (
+        <>
+          <TabPanel value={value} index={0}>
+            <Editor value={''} handleChangeEditorValue={() => {}} />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <Editor value={''} handleChangeEditorValue={() => {}} />
+          </TabPanel>
+        </>
+      )}
+
+      {(props.requestState.status === 'pending' ||
+        props.requestState.status === 'request') && (
+        <div
+          style={{
+            width: '100%'
+          }}
+        >
+          <TabPanel value={value} index={0}>
+            <LoadingResults />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <LoadingResults />
+          </TabPanel>
+        </div>
+      )}
+      {props.transformState.status === 'transformed' &&
+        (props.requestState.status === 'Ok::Rejected' ||
+          props.requestState.status === 'Ok::Resolved') && (
+          <>
+            <TabPanel value={value} index={0}>
+              <Editor
+                value={props.transformState.typesToDisplay || ''}
+                handleChangeEditorValue={props.handleEditCode('typeResponse')}
+              />
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              <Editor
+                value={props.transformState.dataToDisplay || ''}
+                handleChangeEditorValue={props.handleEditCode('dataResponse')}
+              />
+            </TabPanel>
+          </>
+        )}
     </div>
   );
 }

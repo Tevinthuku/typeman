@@ -4,7 +4,6 @@ import { useImmer } from 'use-immer';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Draft } from 'immer';
-import { json2ts } from 'json-ts';
 
 import {
   IDObjectItem,
@@ -26,7 +25,7 @@ const initialAxiosRequest = {
   params: {}
 };
 
-type requestStateMachine =
+export type requestStateMachine =
   | {
       status: 'idle';
     }
@@ -37,14 +36,12 @@ type requestStateMachine =
       status: 'request';
     }
   | {
-      status: 'resolved';
-      typeResponse: string;
-      dataResponse: string;
+      status: 'Ok::Resolved';
+      data: Object;
     }
   | {
-      status: 'rejected';
-      typeResponse: string;
-      dataResponse: string;
+      status: 'Ok::Rejected';
+      error: Object;
     };
 
 type headersHooks = [
@@ -149,35 +146,19 @@ export default function useRequest() {
     });
   };
 
-  const handleEditCode = (type: 'dataResponse' | 'typeResponse') => (
-    code: string
-  ) => {
-    setRequestState(draft => {
-      if (draft.status === 'resolved') draft[type] = code;
-    });
-  };
   useEffect(() => {
     if (requestState.status === 'request') {
       async function loadData() {
         try {
           const data = await Axios(axiosObject);
           setRequestState(() => ({
-            status: 'resolved',
-            typeResponse: json2ts(JSON.stringify(data, null, 2), {
-              flow: true,
-              prefix: ''
-            }),
-            dataResponse: JSON.stringify(data, null, 2)
+            status: 'Ok::Resolved',
+            data
           }));
         } catch (error) {
-          const err = error.response || error;
           setRequestState(() => ({
-            status: 'rejected',
-            typeResponse: json2ts(JSON.stringify(err, null, 2), {
-              flow: true,
-              prefix: ''
-            }),
-            dataResponse: JSON.stringify(err, null, 2)
+            status: 'Ok::Rejected',
+            error
           }));
         }
       }
@@ -240,7 +221,6 @@ export default function useRequest() {
     handleDeleteParam,
     handleEditParam,
     handleEditHeaderItem,
-    handleEditCode,
     handleMakeAPICall,
     handleURLChange,
     handleAddHeader,
