@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Draft } from 'immer';
 
+import useLocalStorage from './useLocalStorage';
+
 import {
   IDObjectItem,
   HeaderType,
@@ -59,6 +61,13 @@ type RequestStateMachineHook = [
   (f: (draft: Draft<requestStateMachine>) => void | requestStateMachine) => void
 ];
 
+type AxiosParamsLocalStorageParams = {
+  headers: IDObjectItem;
+  params: IDObjectItem;
+  body: string;
+  selectedMethod: Method;
+};
+
 const initialRequestState: requestStateMachine = {
   status: 'idle'
 };
@@ -71,13 +80,32 @@ function convertStringToNumber(str: string): string | number {
   }
 }
 
+const initialAxiosParamsLocalStorageParams = {
+  headers: initialHeaders,
+  params: initialHeaders,
+  body: '',
+  selectedMethod: methods[0]
+};
+
 export default function useRequest() {
-  const [headers, setHeaders]: headersHooks = useImmer(initialHeaders);
-  const [params, setParams]: headersHooks = useImmer(initialHeaders);
-  const [body, setBody] = useState('');
-  const [selectedMethod, setSelectedMethod] = React.useState(methods[0]);
+  const [axioslocalStorageParams, setLocalStorageAxiosParams] = useLocalStorage<
+    AxiosParamsLocalStorageParams
+  >('axiosParams', initialAxiosParamsLocalStorageParams);
+  const [storedAxiosRequestObject, setStoredAxiosObject] = useLocalStorage<
+    axiosObject
+  >('axiosRequestObject', initialAxiosRequest);
+  const [headers, setHeaders]: headersHooks = useImmer(
+    axioslocalStorageParams.headers
+  );
+  const [params, setParams]: headersHooks = useImmer(
+    axioslocalStorageParams.params
+  );
+  const [body, setBody] = useState(axioslocalStorageParams.body);
+  const [selectedMethod, setSelectedMethod] = React.useState(
+    axioslocalStorageParams.selectedMethod
+  );
   const [axiosObject, setAxiosObject]: axiosHook = useImmer(
-    initialAxiosRequest
+    storedAxiosRequestObject
   );
   const [requestState, setRequestState]: RequestStateMachineHook = useImmer(
     initialRequestState
@@ -119,6 +147,12 @@ export default function useRequest() {
     setRequestState(draft => {
       draft.status = 'pending';
     });
+    setLocalStorageAxiosParams({
+      headers,
+      params,
+      body,
+      selectedMethod
+    });
     setAxiosObject(draft => {
       for (const header in headers) {
         const key = headers[header].key;
@@ -150,6 +184,7 @@ export default function useRequest() {
     if (requestState.status === 'request') {
       async function loadData() {
         try {
+          setStoredAxiosObject(axiosObject);
           const data = await Axios(axiosObject);
           setRequestState(() => ({
             status: 'Ok::Resolved',
@@ -164,7 +199,7 @@ export default function useRequest() {
       }
       loadData();
     }
-  }, [requestState.status, axiosObject, setRequestState]);
+  }, [requestState.status, axiosObject, setRequestState, setStoredAxiosObject]);
 
   const handleEditHeaderItem = (id: string) => (
     prop: 'key' | 'value' | 'type'

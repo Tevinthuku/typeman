@@ -121,9 +121,11 @@ export default function ResponseSwitcher(props: Props) {
             label="Data Only"
           />
 
-          {props.transformState.status === 'transformed' && (
-            <Button>{props.transformState.statusCode}</Button>
-          )}
+          {props.transformState.status === 'transformed' &&
+            (props.requestState.status === 'Ok::Rejected' ||
+              props.requestState.status === 'Ok::Resolved') && (
+              <Button>{props.transformState.statusCode}</Button>
+            )}
         </Grid>
         <Grid item className={classes.contentGridItem}>
           <>

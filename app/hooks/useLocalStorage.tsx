@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T
-): [T | null | void, (value: T) => void] {
+): [T, (value: T) => void] {
   const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = window.localStorage.getItem(key);

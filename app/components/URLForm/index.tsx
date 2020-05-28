@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -53,6 +53,11 @@ export default function URLForm({
     handleOpenMenu(false);
   };
 
+  const handleSubmitRequestForm = (evt: FormEvent) => {
+    evt.preventDefault();
+    handleMakeAPICall();
+  };
+
   return (
     <Grid
       className={classes.container}
@@ -78,15 +83,17 @@ export default function URLForm({
         </ButtonGroupComponent>
       </Grid>
       <Grid item xs={6} md={8}>
-        <TextField
-          className={classes.input}
-          fullWidth
-          value={axiosObject.url}
-          onChange={handleURLChange}
-          id="outlined-basic"
-          label="Type in the URL"
-          variant="outlined"
-        />
+        <form onSubmit={handleSubmitRequestForm}>
+          <TextField
+            className={classes.input}
+            fullWidth
+            value={axiosObject.url}
+            onChange={handleURLChange}
+            id="outlined-basic"
+            label="Type in the URL"
+            variant="outlined"
+          />
+        </form>
       </Grid>
       <Grid item xs={3} md={2}>
         <Button
