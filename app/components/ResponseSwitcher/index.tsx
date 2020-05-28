@@ -3,12 +3,16 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 import Editor from '../Editor';
 import LoadingResults from '../Loading';
 
 import { TransformStateMachine } from '../../hooks/useTransform';
 import { requestStateMachine } from '../../hooks/useRequest';
+import { Button } from '@material-ui/core';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,6 +54,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`
+  },
+  configurationContainer: {
+    paddingLeft: theme.spacing(4)
+  },
+  contentGridItem: {
+    width: '100%'
   }
 }));
 
@@ -59,6 +69,8 @@ type Props = {
   ) => (s: string) => void;
   transformState: TransformStateMachine;
   requestState: requestStateMachine;
+  setShowDataOnly: (s: boolean) => void;
+  showDataOnly: boolean | void | null;
 };
 
 export default function ResponseSwitcher(props: Props) {
@@ -67,6 +79,13 @@ export default function ResponseSwitcher(props: Props) {
 
   const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleChangeDataToBeDisplayed = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    event.persist();
+    props.setShowDataOnly(event.target.checked);
   };
 
   return (
@@ -83,50 +102,81 @@ export default function ResponseSwitcher(props: Props) {
         <Tab label="Data" {...a11yProps(1)} />
       </Tabs>
 
-      {props.requestState.status === 'idle' && (
-        <>
-          <TabPanel value={value} index={0}>
-            <Editor value={''} handleChangeEditorValue={() => {}} />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <Editor value={''} handleChangeEditorValue={() => {}} />
-          </TabPanel>
-        </>
-      )}
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+      >
+        <Grid item className={classes.configurationContainer}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={Boolean(props.showDataOnly)}
+                onChange={handleChangeDataToBeDisplayed}
+                name="checkedB"
+                color="primary"
+              />
+            }
+            label="Data Only"
+          />
 
-      {(props.requestState.status === 'pending' ||
-        props.requestState.status === 'request') && (
-        <div
-          style={{
-            width: '100%'
-          }}
-        >
-          <TabPanel value={value} index={0}>
-            <LoadingResults />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <LoadingResults />
-          </TabPanel>
-        </div>
-      )}
-      {props.transformState.status === 'transformed' &&
-        (props.requestState.status === 'Ok::Rejected' ||
-          props.requestState.status === 'Ok::Resolved') && (
+          {props.transformState.status === 'transformed' && (
+            <Button>{props.transformState.statusCode}</Button>
+          )}
+        </Grid>
+        <Grid item className={classes.contentGridItem}>
           <>
-            <TabPanel value={value} index={0}>
-              <Editor
-                value={props.transformState.typesToDisplay || ''}
-                handleChangeEditorValue={props.handleEditCode('typeResponse')}
-              />
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-              <Editor
-                value={props.transformState.dataToDisplay || ''}
-                handleChangeEditorValue={props.handleEditCode('dataResponse')}
-              />
-            </TabPanel>
+            {props.requestState.status === 'idle' && (
+              <>
+                <TabPanel value={value} index={0}>
+                  <Editor value={''} handleChangeEditorValue={() => {}} />
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                  <Editor value={''} handleChangeEditorValue={() => {}} />
+                </TabPanel>
+              </>
+            )}
+            {(props.requestState.status === 'pending' ||
+              props.requestState.status === 'request') && (
+              <div
+                style={{
+                  width: '100%'
+                }}
+              >
+                <TabPanel value={value} index={0}>
+                  <LoadingResults />
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                  <LoadingResults />
+                </TabPanel>
+              </div>
+            )}
+            {props.transformState.status === 'transformed' &&
+              (props.requestState.status === 'Ok::Rejected' ||
+                props.requestState.status === 'Ok::Resolved') && (
+                <>
+                  <TabPanel value={value} index={0}>
+                    <Editor
+                      value={props.transformState.typesToDisplay || ''}
+                      handleChangeEditorValue={props.handleEditCode(
+                        'typeResponse'
+                      )}
+                    />
+                  </TabPanel>
+                  <TabPanel value={value} index={1}>
+                    <Editor
+                      value={props.transformState.dataToDisplay || ''}
+                      handleChangeEditorValue={props.handleEditCode(
+                        'dataResponse'
+                      )}
+                    />
+                  </TabPanel>
+                </>
+              )}
           </>
-        )}
+        </Grid>
+      </Grid>
     </div>
   );
 }

@@ -46,7 +46,7 @@ export default function useTransform({
         const { status, data } = requestState.error.response;
         return { status, data };
       }
-      return requestState.error;
+      return requestState.error.response || { status: 500 };
     }
 
     if (requestState.status === 'Ok::Resolved') {
@@ -54,7 +54,7 @@ export default function useTransform({
         const { status, data } = requestState.data;
         return { status, data };
       }
-      return requestState.data;
+      return { data: requestState.data, status: requestState.data.status };
     }
 
     return {};

@@ -14,6 +14,7 @@ import ResponseSwitcher from '../components/ResponseSwitcher';
 
 import useRequest, { methods } from '../hooks/useRequest';
 import useTransform from '../hooks/useTransform';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 // types
 import { makeStyles } from '@material-ui/core';
@@ -29,6 +30,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function HomePage() {
+  const [showDataOnly, setShowDataOnly] = useLocalStorage<boolean>(
+    'showDataOnly',
+    false
+  );
   const {
     handleChange,
     handleDeleteHeader,
@@ -52,7 +57,7 @@ export default function HomePage() {
 
   const { transformState, handleEditCode } = useTransform({
     requestState,
-    showDataOnly: true
+    showDataOnly: Boolean(showDataOnly)
   });
 
   const classes = useStyles();
@@ -109,6 +114,8 @@ export default function HomePage() {
       )}
 
       <ResponseSwitcher
+        showDataOnly={showDataOnly}
+        setShowDataOnly={setShowDataOnly}
         requestState={requestState}
         handleEditCode={handleEditCode}
         transformState={transformState}
