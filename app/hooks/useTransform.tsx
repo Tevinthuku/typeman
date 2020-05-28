@@ -42,16 +42,25 @@ export default function useTransform({
 
   const dataToBeTransformed = useMemo(() => {
     if (requestState.status === 'Ok::Rejected') {
-      if (requestState.error.response && showDataOnly) {
-        const { status, data } = requestState.error.response;
-        return { status, data };
+      if (requestState.error.response) {
+        if (showDataOnly) {
+          const { status, data } = requestState.error.response;
+          return { status, data };
+        } else {
+          return {
+            data: requestState.error.response,
+            status: requestState.error.response.status
+          };
+        }
+      } else {
+        return {
+          data: {
+            message:
+              requestState.error.message || 'net::ERR_INTERNET_DISCONNECTED'
+          },
+          status: requestState.error.status || 500
+        };
       }
-      return (
-        {
-          data: requestState.error.response,
-          status: requestState.error.response.status
-        } || { status: 500 }
-      );
     }
 
     if (requestState.status === 'Ok::Resolved') {
