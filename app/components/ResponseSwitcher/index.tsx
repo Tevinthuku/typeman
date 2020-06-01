@@ -6,13 +6,17 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import Button from '@material-ui/core/Button';
 
 import Editor from '../Editor';
 import LoadingResults from '../Loading';
 
-import { TransformStateMachine } from '../../hooks/useTransform';
+import {
+  TransformStateMachine,
+  TransformPresetObject
+} from '../../hooks/useTransform';
 import { requestStateMachine } from '../../hooks/useRequest';
-import { Button } from '@material-ui/core';
+import TransformPresetSelector from '../TransformPresetSelector';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -71,6 +75,8 @@ type Props = {
   requestState: requestStateMachine;
   setShowDataOnly: (s: boolean) => void;
   showDataOnly: boolean | void | null;
+  transformTo: TransformPresetObject;
+  setTransformPreset: (t: TransformPresetObject) => void;
 };
 
 export default function ResponseSwitcher(props: Props) {
@@ -109,23 +115,34 @@ export default function ResponseSwitcher(props: Props) {
         alignItems="flex-start"
       >
         <Grid item className={classes.configurationContainer}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={Boolean(props.showDataOnly)}
-                onChange={handleChangeDataToBeDisplayed}
-                name="checkedB"
-                color="primary"
+          <Grid container spacing={1}>
+            <Grid item>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={Boolean(props.showDataOnly)}
+                    onChange={handleChangeDataToBeDisplayed}
+                    name="checkedB"
+                    color="primary"
+                  />
+                }
+                label="Data Only"
               />
-            }
-            label="Data Only"
-          />
-
-          {props.transformState.status === 'transformed' &&
-            (props.requestState.status === 'Ok::Rejected' ||
-              props.requestState.status === 'Ok::Resolved') && (
-              <Button>{props.transformState.statusCode}</Button>
-            )}
+            </Grid>
+            <Grid item>
+              {props.transformState.status === 'transformed' &&
+                (props.requestState.status === 'Ok::Rejected' ||
+                  props.requestState.status === 'Ok::Resolved') && (
+                  <Button>{props.transformState.statusCode}</Button>
+                )}
+            </Grid>
+            <Grid item>
+              <TransformPresetSelector
+                transformTo={props.transformTo}
+                setTransformPreset={props.setTransformPreset}
+              />
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item className={classes.contentGridItem}>
           <>

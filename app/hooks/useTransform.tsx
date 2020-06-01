@@ -1,16 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useImmer } from 'use-immer';
-import { json2ts } from 'json-ts';
 
 import { requestStateMachine } from './useRequest';
+import useLocalStorage from './useLocalStorage';
 
-type TransformOption =
-  | {
-      to: 'flow';
-    }
-  | {
-      to: 'typescript';
-    };
+export type TransformationKeys = 'flow' | 'typescript' | 'kotlin';
+
+export type TransformPresetObject = {
+  to: TransformationKeys;
+};
 
 export type TransformStateMachine =
   | {
@@ -32,7 +30,9 @@ export default function useTransform({
   requestState,
   showDataOnly = true
 }: Props) {
-  const [transformTo, setTransformPreset] = useState<TransformOption>({
+  const [transformTo, setTransformPreset] = useLocalStorage<
+    TransformPresetObject
+  >('transformPreset', {
     to: 'flow'
   });
 
@@ -75,34 +75,27 @@ export default function useTransform({
   }, [requestState, showDataOnly]);
 
   useEffect(() => {
-    if (
-      requestState.status === 'Ok::Resolved' ||
-      requestState.status === 'Ok::Rejected'
-    ) {
-      const { data, status } = dataToBeTransformed;
-      if (transformTo.to === 'flow') {
-        setTransformState(() => ({
-          status: 'transformed',
-          statusCode: status,
-          typesToDisplay: json2ts(JSON.stringify(data || '', null, 2), {
-            flow: true,
-            prefix: ''
-          }),
-          dataToDisplay: JSON.stringify(data || '', null, 2)
-        }));
-      }
-
-      if (transformTo.to === 'typescript') {
-        setTransformState(() => ({
-          status: 'transformed',
-          statusCode: status,
-          typesToDisplay: json2ts(JSON.stringify(data || '', null, 2), {
-            prefix: ''
-          }),
-          dataToDisplay: JSON.stringify(data || '', null, 2)
-        }));
+    async function performTransform() {
+      if (
+        requestState.status === 'Ok::Resolved' ||
+        requestState.status === 'Ok::Rejected'
+      ) {
+        const { data, status } = dataToBeTransformed;
+        if (transformTo.to === 'flow' || transformTo.to === 'typescript') {
+          const { json2ts } = await import('json-ts');
+          setTransformState(() => ({
+            status: 'transformed',
+            statusCode: status,
+            typesToDisplay: json2ts(JSON.stringify(data || '', null, 2), {
+              flow: transformTo.to === 'flow',
+              prefix: ''
+            }),
+            dataToDisplay: JSON.stringify(data || '', null, 2)
+          }));
+        }
       }
     }
+    performTransform();
   }, [requestState, transformTo, setTransformState, dataToBeTransformed]);
 
   const handleEditCode = (type: 'dataResponse' | 'typeResponse') => (
@@ -116,5 +109,5 @@ export default function useTransform({
     });
   };
 
-  return { setTransformPreset, transformState, handleEditCode };
+  return { setTransformPreset, transformState, handleEditCode, transformTo };
 }

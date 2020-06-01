@@ -29,7 +29,11 @@ export default function Editor({
     [theme.palette.type]
   );
   return (
-    <Paper>
+    <Paper
+      style={{
+        width
+      }}
+    >
       <AceEditor
         height={height}
         width={width}

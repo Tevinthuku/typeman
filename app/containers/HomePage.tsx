@@ -55,7 +55,12 @@ export default function HomePage() {
     requestState
   } = useRequest();
 
-  const { transformState, handleEditCode } = useTransform({
+  const {
+    transformState,
+    handleEditCode,
+    transformTo,
+    setTransformPreset
+  } = useTransform({
     requestState,
     showDataOnly: Boolean(showDataOnly)
   });
@@ -119,6 +124,8 @@ export default function HomePage() {
         requestState={requestState}
         handleEditCode={handleEditCode}
         transformState={transformState}
+        transformTo={transformTo}
+        setTransformPreset={setTransformPreset}
       />
     </div>
   );
