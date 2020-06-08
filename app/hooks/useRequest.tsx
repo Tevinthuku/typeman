@@ -127,7 +127,7 @@ export default function useRequest() {
   };
 
   const handleAddParam = (param: HeaderType) => {
-    setHeaders(draft => {
+    setParams(draft => {
       const uniqueId = uuidv4();
       draft[uniqueId] = {
         ...param,
