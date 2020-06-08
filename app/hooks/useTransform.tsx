@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useImmer } from 'use-immer';
+import { json2ts } from 'json-ts';
 
 import { requestStateMachine } from './useRequest';
 import useLocalStorage from './useLocalStorage';
@@ -82,7 +83,6 @@ export default function useTransform({
       ) {
         const { data, status } = dataToBeTransformed;
         if (transformTo.to === 'flow' || transformTo.to === 'typescript') {
-          const { json2ts } = await import('json-ts');
           setTransformState(() => ({
             status: 'transformed',
             statusCode: status,
