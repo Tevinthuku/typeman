@@ -39,7 +39,10 @@ export type requestStateMachine =
     }
   | {
       status: 'Ok::Resolved';
-      data: Object;
+      data: {
+        status: number;
+        data: Object;
+      };
     }
   | {
       status: 'Ok::Rejected';
@@ -144,9 +147,9 @@ export default function useRequest() {
   };
 
   const handleMakeAPICall = async () => {
-    setRequestState(draft => {
-      draft.status = 'pending';
-    });
+    setRequestState(() => ({
+      status: 'pending'
+    }));
     setLocalStorageAxiosParams({
       headers,
       params,
@@ -175,9 +178,9 @@ export default function useRequest() {
       draft.method = selectedMethod;
     });
 
-    setRequestState(draft => {
-      draft.status = 'request';
-    });
+    setRequestState(() => ({
+      status: 'request'
+    }));
   };
 
   useEffect(() => {

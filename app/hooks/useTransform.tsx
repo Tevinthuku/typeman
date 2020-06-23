@@ -101,7 +101,7 @@ export default function useTransform({
   const handleEditCode = (type: 'dataResponse' | 'typeResponse') => (
     code: string
   ) => {
-    setTransformState(draft => {
+    setTransformState((draft: TransformStateMachine) => {
       if (draft.status === 'transformed') {
         if (type === 'dataResponse') draft.dataToDisplay = code;
         if (type === 'typeResponse') draft.typesToDisplay = code;
