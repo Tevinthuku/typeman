@@ -3,8 +3,16 @@ import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
+import { makeStyles } from '@material-ui/core';
 
 import Lambda from '../components/LambdaIcon';
+
+const useStyles = makeStyles(() => ({
+  title: {
+    fontSize: '1.25rem',
+    fontWeight: 'bolder'
+  }
+}));
 
 type Props = {
   children: ReactNode;
@@ -12,6 +20,7 @@ type Props = {
 
 export default function App(props: Props) {
   const { children } = props;
+  const classes = useStyles();
   return (
     <>
       <AppBar position="sticky">
@@ -19,7 +28,9 @@ export default function App(props: Props) {
           <IconButton edge="start" color="inherit" aria-label="menu">
             <Lambda />
           </IconButton>
-          <Typography variant="h6">Typeman</Typography>
+          <Typography className={classes.title} variant="h1">
+            Typeman
+          </Typography>
         </Toolbar>
       </AppBar>
       {children}

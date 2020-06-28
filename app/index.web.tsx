@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import { render } from 'react-dom';
@@ -8,18 +8,20 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
 import App from './containers/App';
-import HomePage from './containers/HomePage';
 import Landing from './containers/LandingPage';
 import routes from './constants/webroutes.json';
-
 import useTheme from './hooks/useTheme';
+
+const Workspace = lazy(() => import('./containers/HomePage'));
 
 function Routes() {
   return (
     <App>
       <Switch>
+        <Suspense fallback={<div />}>
+          <Route path={routes.WORKSPACE} component={Workspace} />
+        </Suspense>
         <Route exact path={routes.HOME} component={Landing} />
-        <Route path={routes.WORKSPACE} component={HomePage} />
       </Switch>
     </App>
   );

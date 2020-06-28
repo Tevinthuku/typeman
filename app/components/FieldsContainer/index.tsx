@@ -140,7 +140,11 @@ export default function FieldsContainer({
                   alignItems="center"
                 >
                   <Grid item>
-                    <ButtonGroupComponent itemSelected={item.type}>
+                    <ButtonGroupComponent
+                      ariaLabel="Prop data type selection"
+                      buttonGroupLabel="Select Data type of the property"
+                      itemSelected={item.type}
+                    >
                       {handleClose => (
                         <MenuList id="split-button-menu">
                           {supportedDataTypes.map(option => (
@@ -205,7 +209,11 @@ export default function FieldsContainer({
                     alignItems="center"
                   >
                     <Grid item>
-                      <ButtonGroupComponent itemSelected={row.type}>
+                      <ButtonGroupComponent
+                        ariaLabel={`edit ${row.key} 's  data type`}
+                        buttonGroupLabel={`Select ${row.key} 's Data type`}
+                        itemSelected={row.type}
+                      >
                         {handleClose => (
                           <MenuList id="split-button-menu">
                             {supportedDataTypes.map(option => (

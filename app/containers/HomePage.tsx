@@ -25,9 +25,38 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(1)
   },
   tabsRoot: {
-    backgroundColor: theme.palette.background.default
+    backgroundColor: theme.palette.background.paper
   }
 }));
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <>{children}</>}
+    </div>
+  );
+}
+
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`
+  };
+}
 
 export default function HomePage() {
   const [showDataOnly, setShowDataOnly] = useLocalStorage<boolean>(
@@ -84,39 +113,39 @@ export default function HomePage() {
         <Tabs
           value={requestOption}
           indicatorColor="primary"
-          textColor="primary"
+          textColor="inherit"
           onChange={handleChange}
-          aria-label="disabled tabs example"
+          aria-label="select between header or params or the body editor"
         >
-          <Tab label="Headers" />
-          <Tab label="Params" />
-          <Tab label="Body" />
+          <Tab label="Headers" {...a11yProps(0)} />
+          <Tab label="Params" {...a11yProps(1)} />
+          <Tab label="Body" {...a11yProps(2)} />
         </Tabs>
       </Paper>
-      {requestOption === 0 && (
+      <TabPanel value={requestOption} index={0}>
         <Headers
           handleDeleteHeader={handleDeleteHeader}
           headers={headers}
           handleEditHeaderItem={handleEditHeaderItem}
           handleAddHeader={handleAddHeader}
         />
-      )}
-      {requestOption === 1 && (
+      </TabPanel>
+      <TabPanel value={requestOption} index={1}>
         <Params
           handleEditParam={handleEditParam}
           handleAddParam={handleAddParam}
           params={params}
           handleDeleteParam={handleDeleteParam}
         />
-      )}
-      {requestOption === 2 && (
+      </TabPanel>
+      <TabPanel value={requestOption} index={2}>
         <Editor
           height="200px"
           width="100vw"
           value={body}
           handleChangeEditorValue={setBody}
         />
-      )}
+      </TabPanel>
 
       <ResponseSwitcher
         showDataOnly={showDataOnly}

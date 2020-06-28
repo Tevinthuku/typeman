@@ -66,7 +66,11 @@ export default function URLForm({
       container
     >
       <Grid item xs={3} md={2}>
-        <ButtonGroupComponent itemSelected={selectedMethod}>
+        <ButtonGroupComponent
+          ariaLabel="HTTP Methods"
+          buttonGroupLabel="Select HTTP Method"
+          itemSelected={selectedMethod}
+        >
           {handleClose => (
             <MenuList id="split-button-menu">
               {methods.map(method => (

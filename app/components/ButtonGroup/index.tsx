@@ -14,6 +14,8 @@ export type handleCloseButtonGroupType = React.Dispatch<
 >;
 
 type Props = {
+  ariaLabel: string;
+  buttonGroupLabel: string;
   itemSelected: string;
   children: (fn: handleCloseButtonGroupType) => React.ReactNode;
 };
@@ -24,8 +26,10 @@ const useStyles = makeStyles(() => ({
   }
 }));
 export default function ButtonGroupComponent({
+  ariaLabel,
   itemSelected,
-  children
+  children,
+  buttonGroupLabel
 }: Props) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
@@ -53,7 +57,7 @@ export default function ButtonGroupComponent({
           variant="contained"
           color="primary"
           ref={anchorRef}
-          aria-label="split button"
+          aria-label={ariaLabel}
         >
           <Button>{itemSelected}</Button>
           <Button
@@ -61,7 +65,7 @@ export default function ButtonGroupComponent({
             size="small"
             aria-controls={open ? 'split-button-menu' : undefined}
             aria-expanded={open ? 'true' : undefined}
-            aria-label="select merge strategy"
+            aria-label={buttonGroupLabel}
             aria-haspopup="menu"
             onClick={handleToggle}
           >
