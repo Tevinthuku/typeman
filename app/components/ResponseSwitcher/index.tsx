@@ -7,7 +7,10 @@ import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
-
+import Copy from '@material-ui/icons/FileCopyOutlined';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import Editor from '../Editor';
 import LoadingResults from '../Loading';
 
@@ -82,7 +85,15 @@ type Props = {
 export default function ResponseSwitcher(props: Props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
 
+  const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
   const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
@@ -92,6 +103,12 @@ export default function ResponseSwitcher(props: Props) {
   ) => {
     event.persist();
     props.setShowDataOnly(event.target.checked);
+  };
+
+  const handleCopyTypeData = (data: string) => () => {
+    navigator.clipboard.writeText(data).then(() => {
+      setOpen(true);
+    });
   };
 
   return (
@@ -107,7 +124,31 @@ export default function ResponseSwitcher(props: Props) {
         <Tab label="Types" {...a11yProps(0)} />
         <Tab label="Data" {...a11yProps(1)} />
       </Tabs>
-
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message="Successfully copied to clipboard"
+        action={
+          <React.Fragment>
+            <Button color="secondary" size="small" onClick={handleClose}>
+              CLOSE
+            </Button>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
       <Grid
         container
         direction="row"
@@ -115,7 +156,7 @@ export default function ResponseSwitcher(props: Props) {
         alignItems="flex-start"
       >
         <Grid item className={classes.configurationContainer}>
-          <Grid container spacing={1}>
+          <Grid container spacing={3}>
             <Grid item>
               <FormControlLabel
                 control={
@@ -141,6 +182,20 @@ export default function ResponseSwitcher(props: Props) {
                 transformTo={props.transformTo}
                 setTransformPreset={props.setTransformPreset}
               />
+            </Grid>
+            <Grid item>
+              {props.transformState.status === 'transformed' &&
+                (props.requestState.status === 'Ok::Rejected' ||
+                  props.requestState.status === 'Ok::Resolved') && (
+                  <Button
+                    onClick={handleCopyTypeData(
+                      props.transformState.typesToDisplay || ''
+                    )}
+                    endIcon={<Copy />}
+                  >
+                    Copy Type Results
+                  </Button>
+                )}
             </Grid>
           </Grid>
         </Grid>

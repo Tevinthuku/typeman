@@ -18,10 +18,10 @@ function Routes() {
   return (
     <App>
       <Switch>
+        <Route exact path={routes.HOME} component={Landing} />
         <Suspense fallback={<div />}>
           <Route path={routes.WORKSPACE} component={Workspace} />
         </Suspense>
-        <Route exact path={routes.HOME} component={Landing} />
       </Switch>
     </App>
   );
