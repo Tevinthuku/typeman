@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Lambda from '../components/LambdaIcon';
 
+
 const HowItWorks = lazy(() => import('../components/HowItWorks'));
 
 const useStyles = makeStyles(theme => ({
@@ -66,6 +67,7 @@ export default function SignInSide() {
           <Suspense fallback={<div />}>
             <HowItWorks />
           </Suspense>
+          <br />
         </div>
       </Grid>
     </Grid>

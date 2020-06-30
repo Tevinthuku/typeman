@@ -7,6 +7,7 @@ import {
 } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Stepper from '@material-ui/core/Stepper';
+import Grid from '@material-ui/core/Grid';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
@@ -101,9 +102,10 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(1)
     },
     buttonsContainer: {
-      marginTop: theme.spacing(8),
-      display: 'flex',
-      justifyContent: 'center'
+      marginTop: theme.spacing(2)
+    },
+    unsplashLink: {
+      color: theme.palette.text.primary
     }
   })
 );
@@ -200,24 +202,55 @@ export default function CustomizedSteppers() {
           </div>
         )}
 
+        <Grid container spacing={4} className={classes.buttonsContainer}>
+          <Grid item xs={6}>
+            <Button
+              fullWidth
+              variant="outlined"
+              className={classes.button}
+              component={Link}
+              to="/workspace"
+              startIcon={<WebIcon />}
+            >
+              Web Workspace
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button
+              fullWidth
+              variant="outlined"
+              className={classes.button}
+              component="a"
+              target="_blank"
+              startIcon={<DownloadIcon />}
+              href="https://drive.google.com/drive/folders/1-ZG2_E0g3wDjUlmh-JQTbG_lvv4cBEuY?usp=sharing"
+            >
+              Download app
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="contained"
+              component="a"
+              target="_blank"
+              href="https://github.com/Tevinthuku/typeman"
+            >
+              View source code
+            </Button>
+          </Grid>
+        </Grid>
         <div className={classes.buttonsContainer}>
-          <Button
-            className={classes.button}
-            component={Link}
-            to="/workspace"
-            startIcon={<WebIcon />}
-          >
-            Web Workspace
-          </Button>
-          <Button
-            className={classes.button}
+          <Typography
             component="a"
             target="_blank"
-            startIcon={<DownloadIcon />}
-            href="https://drive.google.com/drive/folders/1-ZG2_E0g3wDjUlmh-JQTbG_lvv4cBEuY?usp=sharing"
+            href="https://unsplash.com/"
+            variant="overline"
+            align="center"
+            className={classes.unsplashLink}
           >
-            Download app
-          </Button>
+            Random Images Provided by Unsplash
+          </Typography>
         </div>
       </div>
     </div>
