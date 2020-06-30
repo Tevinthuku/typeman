@@ -7,6 +7,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
+import LoadingWorkSpace from './components/LoadingWorkspace';
+
 import App from './containers/App';
 import Landing from './containers/LandingPage';
 import routes from './constants/webroutes.json';
@@ -19,7 +21,7 @@ function Routes() {
     <App>
       <Switch>
         <Route exact path={routes.HOME} component={Landing} />
-        <Suspense fallback={<div />}>
+        <Suspense fallback={<LoadingWorkSpace />}>
           <Route path={routes.WORKSPACE} component={Workspace} />
         </Suspense>
       </Switch>
