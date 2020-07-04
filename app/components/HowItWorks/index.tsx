@@ -129,7 +129,7 @@ function getStepContent(step: number) {
       return `Type in your endpoint URL and the data required to access the endpoint.
         It could be headers, parameters or the body field. Works just like Postman`;
     case 2:
-      return `Hit the run button to see results of the
+      return `Hit the SEND button to see results of the
               type definitions of your data & also the data
               itself if you want to. Using the data-only toggle you can select if you just want to see the data itself or the data + all the headers and other meta data returned by the endpoint.`;
     default:
