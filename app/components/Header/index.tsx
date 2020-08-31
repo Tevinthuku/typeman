@@ -1,14 +1,16 @@
 import React from 'react';
 
 import FieldsContainer from '../FieldsContainer';
-import { IDObjectItem, HeaderType } from '../../types/data';
+import {
+  IDObjectItem,
+  HeaderType,
+  AxiosHeaderParamType
+} from '../../types/data';
 
 type Props = {
   handleAddHeader: (h: HeaderType) => void;
   headers: IDObjectItem;
-  handleEditHeaderItem: (
-    id: string
-  ) => (prop: 'key' | 'value' | 'type') => (value: string) => void;
+  handleEditHeaderItem: (id: string) => (value: AxiosHeaderParamType) => void;
   handleDeleteHeader: (id: string) => () => void;
 };
 

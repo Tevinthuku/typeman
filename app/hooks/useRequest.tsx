@@ -1,31 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import Axios, { Method } from 'axios';
+import Axios, { Method, AxiosError, AxiosRequestConfig } from 'axios';
 import { useImmer } from 'use-immer';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Draft } from 'immer';
-
 import useLocalStorage from './useLocalStorage';
 
-import {
-  IDObjectItem,
-  HeaderType,
-  supportedDataTypes,
-  HeaderItemType
-} from '../types/data';
-import { axiosObject } from '../types/request';
+import { IDObjectItem, HeaderType, AxiosHeaderParamType } from '../types/data';
 
 const initialHeaders: IDObjectItem = {};
 
 export const methods: Method[] = ['GET', 'POST', 'DELETE', 'PUT'];
 
-const initialAxiosRequest = {
-  url: 'https://jsonplaceholder.typicode.com/posts/1',
-  method: methods[0],
-  headers: {},
-  data: {},
-  params: {}
-};
+export type requestResultState =
+  | {
+      status: 'Ok::Resolved';
+      data: {
+        status: number;
+        data: Object;
+      };
+    }
+  | {
+      status: 'Ok::Rejected';
+      error: AxiosError;
+    };
 
 export type requestStateMachine =
   | {
@@ -36,35 +33,12 @@ export type requestStateMachine =
     }
   | {
       status: 'request';
+      requestObject: AxiosRequestConfig;
     }
-  | {
-      status: 'Ok::Resolved';
-      data: {
-        status: number;
-        data: Object;
-      };
-    }
-  | {
-      status: 'Ok::Rejected';
-      error: Object;
-    };
-
-type headersHooks = [
-  IDObjectItem,
-  (f: (draft: Draft<IDObjectItem>) => void | IDObjectItem) => void
-];
-
-type axiosHook = [
-  axiosObject,
-  (f: (draft: Draft<axiosObject>) => void | axiosObject) => void
-];
-
-type RequestStateMachineHook = [
-  requestStateMachine,
-  (f: (draft: Draft<requestStateMachine>) => void | requestStateMachine) => void
-];
+  | requestResultState;
 
 type AxiosParamsLocalStorageParams = {
+  url: string;
   headers: IDObjectItem;
   params: IDObjectItem;
   body: string;
@@ -84,6 +58,7 @@ function convertStringToNumber(str: string): string | number {
 }
 
 const initialAxiosParamsLocalStorageParams = {
+  url: 'https://jsonplaceholder.typicode.com/posts/1',
   headers: initialHeaders,
   params: initialHeaders,
   body: '',
@@ -94,23 +69,20 @@ export default function useRequest() {
   const [axioslocalStorageParams, setLocalStorageAxiosParams] = useLocalStorage<
     AxiosParamsLocalStorageParams
   >('axiosParams', initialAxiosParamsLocalStorageParams);
-  const [storedAxiosRequestObject, setStoredAxiosObject] = useLocalStorage<
-    axiosObject
-  >('axiosRequestObject', initialAxiosRequest);
-  const [headers, setHeaders]: headersHooks = useImmer(
+
+  const [headers, setHeaders] = useImmer<IDObjectItem>(
     axioslocalStorageParams.headers
   );
-  const [params, setParams]: headersHooks = useImmer(
+  const [params, setParams] = useImmer<IDObjectItem>(
     axioslocalStorageParams.params
   );
   const [body, setBody] = useState(axioslocalStorageParams.body);
+  const [url, setUrl] = useState(axioslocalStorageParams.url);
   const [selectedMethod, setSelectedMethod] = React.useState(
     axioslocalStorageParams.selectedMethod
   );
-  const [axiosObject, setAxiosObject]: axiosHook = useImmer(
-    storedAxiosRequestObject
-  );
-  const [requestState, setRequestState]: RequestStateMachineHook = useImmer(
+
+  const [requestState, setRequestState] = useImmer<requestStateMachine>(
     initialRequestState
   );
   const [requestOption, setRequestOption] = useState(0);
@@ -141,9 +113,7 @@ export default function useRequest() {
 
   const handleURLChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     evt.persist();
-    setAxiosObject(draft => {
-      draft.url = evt.target.value;
-    });
+    setUrl(() => evt.target.value);
   };
 
   const handleMakeAPICall = async () => {
@@ -151,44 +121,50 @@ export default function useRequest() {
       status: 'pending'
     }));
     setLocalStorageAxiosParams({
+      url,
       headers,
       params,
       body,
       selectedMethod
     });
-    setAxiosObject(draft => {
-      for (const header in headers) {
-        const key = headers[header].key;
-        draft.headers[key] =
-          headers[header].type === 'number'
-            ? convertStringToNumber(headers[header].value)
-            : String(headers[header].value);
-      }
-      for (const param in params) {
-        const key = params[param].key;
-        draft.params[key] =
-          params[param].type === 'number'
-            ? convertStringToNumber(params[param].value)
-            : String(params[param].value);
-      }
+    const requestObject: AxiosRequestConfig = {
+      url,
+      headers: {},
+      params: {},
+      data: {}
+    };
 
-      try {
-        draft.data = JSON.parse(body);
-      } catch (err) {}
-      draft.method = selectedMethod;
-    });
+    for (const header in headers) {
+      const key = headers[header].key;
+      requestObject.headers[key] =
+        headers[header].type === 'number'
+          ? convertStringToNumber(headers[header].value)
+          : String(headers[header].value);
+    }
+    for (const param in params) {
+      const key = params[param].key;
+      requestObject.params[key] =
+        params[param].type === 'number'
+          ? convertStringToNumber(params[param].value)
+          : String(params[param].value);
+    }
+
+    try {
+      requestObject.data = JSON.parse(body);
+    } catch (err) {}
+    requestObject.method = selectedMethod;
 
     setRequestState(() => ({
-      status: 'request'
+      status: 'request',
+      requestObject
     }));
   };
 
   useEffect(() => {
     if (requestState.status === 'request') {
-      async function loadData() {
+      async function loadData(reqObject: AxiosRequestConfig) {
         try {
-          setStoredAxiosObject(axiosObject);
-          const data = await Axios(axiosObject);
+          const data = await Axios(reqObject);
           setRequestState(() => ({
             status: 'Ok::Resolved',
             data
@@ -200,44 +176,28 @@ export default function useRequest() {
           }));
         }
       }
-      loadData();
+      loadData(requestState.requestObject);
     }
-  }, [requestState.status, axiosObject, setRequestState, setStoredAxiosObject]);
+  }, [requestState, setRequestState]);
 
   const handleEditHeaderItem = (id: string) => (
-    prop: 'key' | 'value' | 'type'
-  ) => (value: string | HeaderItemType) => {
+    propObject: AxiosHeaderParamType
+  ) => {
     setHeaders(draft => {
-      if (prop === 'type') {
-        if (
-          supportedDataTypes[0] === value ||
-          supportedDataTypes[1] === value
-        ) {
-          const itemToBeEdited = draft[id];
-          if (itemToBeEdited) itemToBeEdited[prop] = value;
-        }
-      } else {
-        const itemToBeEdited = draft[id];
-        if (itemToBeEdited) itemToBeEdited[prop] = value;
-      }
+      const item = draft[id];
+      if (item && propObject.item !== 'type')
+        item[propObject.item] = propObject.itemValue;
+      if (propObject.item === 'type') item['type'] = propObject.itemType;
     });
   };
-  const handleEditParam = (id: string) => (prop: 'key' | 'value' | 'type') => (
-    value: string | HeaderItemType
+  const handleEditParam = (id: string) => (
+    propObject: AxiosHeaderParamType
   ) => {
     setParams(draft => {
-      if (prop === 'type') {
-        if (
-          supportedDataTypes[0] === value ||
-          supportedDataTypes[1] === value
-        ) {
-          const itemToBeEdited = draft[id];
-          if (itemToBeEdited) itemToBeEdited[prop] = value;
-        }
-      } else {
-        const itemToBeEdited = draft[id];
-        if (itemToBeEdited) itemToBeEdited[prop] = value;
-      }
+      const item = draft[id];
+      if (item && propObject.item !== 'type')
+        item[propObject.item] = propObject.itemValue;
+      if (propObject.item === 'type') item['type'] = propObject.itemType;
     });
   };
 
@@ -269,8 +229,8 @@ export default function useRequest() {
     headers,
     params,
     body,
+    url,
     selectedMethod,
-    axiosObject,
     requestState
   };
 }

@@ -80,7 +80,7 @@ export default function HomePage() {
     params,
     body,
     selectedMethod,
-    axiosObject,
+    url,
     requestState
   } = useRequest();
 
@@ -100,7 +100,7 @@ export default function HomePage() {
     <div>
       <AppBar elevation={2} className={classes.urlToolbar} position="sticky">
         <URLForm
-          axiosObject={axiosObject}
+          url={url}
           handleURLChange={handleURLChange}
           methods={methods}
           selectedMethod={selectedMethod}

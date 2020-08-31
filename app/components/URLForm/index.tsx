@@ -12,12 +12,11 @@ import ButtonGroupComponent from '../ButtonGroup';
 
 // types
 import { Method } from 'axios';
-import { axiosObject } from '../../types/request';
 
 type URLFormProps = {
-  axiosObject: axiosObject;
   handleMakeAPICall: () => void;
   methods: Method[];
+  url: string;
   setSelectedMethod: React.Dispatch<React.SetStateAction<Method>>;
   selectedMethod: string;
   handleURLChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
@@ -38,10 +37,10 @@ const useStyles = makeStyles(theme => ({
 export default function URLForm({
   handleMakeAPICall,
   methods,
+  url,
   setSelectedMethod,
   selectedMethod,
-  handleURLChange,
-  axiosObject
+  handleURLChange
 }: URLFormProps) {
   const classes = useStyles();
 
@@ -91,7 +90,7 @@ export default function URLForm({
           <TextField
             className={classes.input}
             fullWidth
-            value={axiosObject.url}
+            value={url}
             onChange={handleURLChange}
             id="outlined-basic"
             label="Type in the URL"
