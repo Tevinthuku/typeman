@@ -27,23 +27,17 @@ import {
   IDObjectItem,
   HeaderType,
   supportedDataTypes,
-  HeaderItemType
+  HeaderItemType,
+  AxiosHeaderParamType
 } from '../../types/data';
 import { makeStyles } from '@material-ui/core';
 
 type Props = {
   items: IDObjectItem;
   handleAddItem: (h: HeaderType) => void;
-  handleEditItem: (
-    id: string
-  ) => (prop: 'key' | 'value' | 'type') => (value: string) => void;
+  handleEditItem: (id: string) => (value: AxiosHeaderParamType) => void;
   handleDeleteItem: (id: string) => () => void;
 };
-
-type ItemTypeHook = [
-  HeaderType,
-  (f: (draft: HeaderType) => void | HeaderType) => void
-];
 
 const initialItem: HeaderType = {
   key: '',
@@ -63,7 +57,7 @@ export default function FieldsContainer({
   handleEditItem,
   handleDeleteItem
 }: Props) {
-  const [item, setItem]: ItemTypeHook = useImmer(initialItem);
+  const [item, setItem] = useImmer<HeaderType>(initialItem);
 
   const handleChangeHeaderValue = (key: 'key' | 'value') => (
     evt: React.ChangeEvent<HTMLInputElement>
@@ -94,8 +88,14 @@ export default function FieldsContainer({
     option: HeaderItemType,
     id: string
   ) => () => {
-    handleEditItem(id)('type')(option);
+    handleEditItem(id)({ item: 'type', itemType: option });
     handleClose(false);
+  };
+
+  const handleEditKeyOrValue = (itemType: 'key' | 'value', id: string) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleEditItem(id)({ item: itemType, itemValue: event.target.value });
   };
 
   const classes = useClasses();
@@ -183,9 +183,7 @@ export default function FieldsContainer({
                     variant="outlined"
                     placeholder="Key"
                     value={row.key}
-                    onChange={e =>
-                      handleEditItem(row.id)('key')(e.target.value)
-                    }
+                    onChange={handleEditKeyOrValue('key', row.id)}
                     fullWidth
                   />
                 </TableCell>
@@ -196,9 +194,7 @@ export default function FieldsContainer({
                     placeholder="Value"
                     fullWidth
                     multiline
-                    onChange={(e: { target: { value: string } }) =>
-                      handleEditItem(row.id)('value')(e.target.value)
-                    }
+                    onChange={handleEditKeyOrValue('value', row.id)}
                   />
                 </TableCell>
                 <TableCell align="center">

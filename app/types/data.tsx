@@ -10,3 +10,13 @@ export type IDObjectItem = {
   };
 };
 export const supportedDataTypes: HeaderItemType[] = ['string', 'number'];
+
+export type AxiosHeaderParamType =
+  | {
+      item: 'key' | 'value';
+      itemValue: string;
+    }
+  | {
+      item: 'type';
+      itemType: HeaderItemType;
+    };
