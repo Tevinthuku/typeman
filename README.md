@@ -4,7 +4,8 @@ A tool meant to improve your type driven development productivity.
 
 Run API endpoints with the tool and get back the type definition of the data returned as a response.
 
-![img](https://i.imgur.com/6d9IZZX.png)
+![image](https://user-images.githubusercontent.com/12128153/92140345-a0f18f80-ee19-11ea-9da1-d52dbb225d43.png)
+
 
 ## How to use this
 
