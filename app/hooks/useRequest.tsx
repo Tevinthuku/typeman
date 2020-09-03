@@ -49,7 +49,7 @@ const initialRequestState: requestStateMachine = {
   status: 'idle'
 };
 
-function convertStringToNumber(str: string): string | number {
+function convertStringToNumberIfNecessary(str: string): string | number {
   if (/^[-+]?(\d+|Infinity)$/.test(str)) {
     return Number(str);
   } else {
@@ -133,22 +133,20 @@ export default function useRequest() {
       params: {},
       data: {}
     };
-
     for (const header in headers) {
       const key = headers[header].key;
-      requestObject.headers[key] =
-        headers[header].type === 'number'
-          ? convertStringToNumber(headers[header].value)
-          : String(headers[header].value);
+      requestObject.headers[key] = convertStringToNumberIfNecessary(
+        headers[header].value
+      );
     }
     for (const param in params) {
       const key = params[param].key;
-      requestObject.params[key] =
-        params[param].type === 'number'
-          ? convertStringToNumber(params[param].value)
-          : String(params[param].value);
+      requestObject.params[key] = convertStringToNumberIfNecessary(
+        params[param].value
+      );
     }
 
+    console.log(requestObject);
     try {
       requestObject.data = JSON.parse(body);
     } catch (err) {}
@@ -185,9 +183,7 @@ export default function useRequest() {
   ) => {
     setHeaders(draft => {
       const item = draft[id];
-      if (item && propObject.item !== 'type')
-        item[propObject.item] = propObject.itemValue;
-      if (propObject.item === 'type') item['type'] = propObject.itemType;
+      if (item) item[propObject.item] = propObject.itemValue;
     });
   };
   const handleEditParam = (id: string) => (
@@ -195,9 +191,7 @@ export default function useRequest() {
   ) => {
     setParams(draft => {
       const item = draft[id];
-      if (item && propObject.item !== 'type')
-        item[propObject.item] = propObject.itemValue;
-      if (propObject.item === 'type') item['type'] = propObject.itemType;
+      if (item) item[propObject.item] = propObject.itemValue;
     });
   };
 
