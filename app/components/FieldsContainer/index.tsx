@@ -11,23 +11,15 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Fab from '@material-ui/core/Fab';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
 
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import ValueInputComponent from '../ValueInput';
 
-import ButtonGroupComponent, {
-  handleCloseButtonGroupType
-} from '../ButtonGroup';
-
 import {
   IDObjectItem,
   HeaderType,
-  supportedDataTypes,
-  HeaderItemType,
   AxiosHeaderParamType
 } from '../../types/data';
 import { makeStyles } from '@material-ui/core';
@@ -41,8 +33,7 @@ type Props = {
 
 const initialItem: HeaderType = {
   key: '',
-  value: '',
-  type: supportedDataTypes[0]
+  value: ''
 };
 
 const useClasses = makeStyles(theme => ({
@@ -68,28 +59,10 @@ export default function FieldsContainer({
       if (key === 'value') draft.value = evt.target.value;
     });
   };
-  const handleSelectValueType = (
-    handleClose: handleCloseButtonGroupType,
-    type: HeaderItemType
-  ) => () => {
-    setItem(draft => {
-      draft.type = type;
-    });
-    handleClose(false);
-  };
 
   const handleAddNewItem = () => {
     handleAddItem(item);
     setItem(() => initialItem);
-  };
-
-  const handleEditTypeOfItem = (
-    handleClose: handleCloseButtonGroupType,
-    option: HeaderItemType,
-    id: string
-  ) => () => {
-    handleEditItem(id)({ item: 'type', itemType: option });
-    handleClose(false);
   };
 
   const handleEditKeyOrValue = (itemType: 'key' | 'value', id: string) => (
@@ -140,30 +113,6 @@ export default function FieldsContainer({
                   alignItems="center"
                 >
                   <Grid item>
-                    <ButtonGroupComponent
-                      ariaLabel="Prop data type selection"
-                      buttonGroupLabel="Select Data type of the property"
-                      itemSelected={item.type}
-                    >
-                      {handleClose => (
-                        <MenuList id="split-button-menu">
-                          {supportedDataTypes.map(option => (
-                            <MenuItem
-                              key={option}
-                              selected={option === item.type}
-                              onClick={handleSelectValueType(
-                                handleClose,
-                                option
-                              )}
-                            >
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </MenuList>
-                      )}
-                    </ButtonGroupComponent>
-                  </Grid>
-                  <Grid item>
                     <Fab
                       size="small"
                       onClick={handleAddNewItem}
@@ -204,31 +153,6 @@ export default function FieldsContainer({
                     justify="space-between"
                     alignItems="center"
                   >
-                    <Grid item>
-                      <ButtonGroupComponent
-                        ariaLabel={`edit ${row.key} 's  data type`}
-                        buttonGroupLabel={`Select ${row.key} 's Data type`}
-                        itemSelected={row.type}
-                      >
-                        {handleClose => (
-                          <MenuList id="split-button-menu">
-                            {supportedDataTypes.map(option => (
-                              <MenuItem
-                                key={option}
-                                selected={option === row.type}
-                                onClick={handleEditTypeOfItem(
-                                  handleClose,
-                                  option,
-                                  row.id
-                                )}
-                              >
-                                {option}
-                              </MenuItem>
-                            ))}
-                          </MenuList>
-                        )}
-                      </ButtonGroupComponent>
-                    </Grid>
                     <Grid item>
                       <Fab
                         size="small"
