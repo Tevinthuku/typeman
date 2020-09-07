@@ -10,12 +10,15 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import LoadingWorkSpace from './components/LoadingWorkspace';
 
 import App from './containers/App';
-import Landing from './containers/LandingPage';
 import routes from './constants/webroutes.json';
 import useTheme from './hooks/useTheme';
 
+import Landing from './containers/LandingPage';
+import { registerSW } from './sw';
+
 const Workspace = lazy(() => import('./containers/HomePage'));
 
+registerSW();
 function Routes() {
   return (
     <App>

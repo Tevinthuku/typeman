@@ -1,6 +1,5 @@
 import { useEffect, useCallback } from 'react';
 import { useImmer } from 'use-immer';
-import { json2ts } from 'json-ts';
 
 import { requestStateMachine, requestResultState } from './useRequest';
 import useLocalStorage from './useLocalStorage';
@@ -82,6 +81,9 @@ export default function useTransform({
       ) {
         const { data, status } = dataToBeTransformed(requestState);
         if (transformTo.to === 'flow' || transformTo.to === 'typescript') {
+          const { json2ts } = await import(
+            /* webpackChunkName: "json-ts" */ 'json-ts'
+          );
           setTransformState(() => ({
             status: 'transformed',
             statusCode: status,

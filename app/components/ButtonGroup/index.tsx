@@ -22,7 +22,7 @@ type Props = {
 
 const useStyles = makeStyles(() => ({
   poper: {
-    zIndex: 1000
+    zIndex: 100000
   }
 }));
 export default function ButtonGroupComponent({
@@ -72,11 +72,11 @@ export default function ButtonGroupComponent({
             <ArrowDropDownIcon />
           </Button>
         </ButtonGroup>
-        <div className={classes.poper}>
+        <div>
           <Popper
             open={open}
-            disablePortal={false}
             anchorEl={anchorRef.current}
+            className={classes.poper}
             role={undefined}
             transition
           >
@@ -84,7 +84,6 @@ export default function ButtonGroupComponent({
               <Grow
                 {...TransitionProps}
                 style={{
-                  zIndex: 1000,
                   transformOrigin:
                     placement === 'bottom' ? 'center top' : 'center bottom'
                 }}
