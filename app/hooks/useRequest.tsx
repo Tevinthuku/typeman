@@ -146,7 +146,6 @@ export default function useRequest() {
       );
     }
 
-    console.log(requestObject);
     try {
       requestObject.data = JSON.parse(body);
     } catch (err) {}

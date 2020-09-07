@@ -5,7 +5,8 @@ module.exports = {
   entry: './app/index.web.tsx',
   output: {
     path: path.join(__dirname, '../webdist'),
-    filename: 'app.bundle.js',
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].bundle.js',
     publicPath: '/'
   },
   module: {
