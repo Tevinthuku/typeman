@@ -14,7 +14,7 @@ import ButtonGroupComponent from '../ButtonGroup';
 import { Method } from 'axios';
 
 type URLFormProps = {
-  handleMakeAPICall: () => void;
+  beginRequestProcessing: () => void;
   methods: Method[];
   url: string;
   setSelectedMethod: React.Dispatch<React.SetStateAction<Method>>;
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function URLForm({
-  handleMakeAPICall,
+  beginRequestProcessing,
   methods,
   url,
   setSelectedMethod,
@@ -54,7 +54,7 @@ export default function URLForm({
 
   const handleSubmitRequestForm = (evt: FormEvent) => {
     evt.preventDefault();
-    handleMakeAPICall();
+    beginRequestProcessing();
   };
 
   return (
@@ -103,7 +103,7 @@ export default function URLForm({
           className={classes.submitButton}
           color="primary"
           variant="contained"
-          onClick={handleMakeAPICall}
+          onClick={beginRequestProcessing}
         >
           Send
         </Button>

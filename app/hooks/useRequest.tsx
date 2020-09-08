@@ -116,7 +116,7 @@ export default function useRequest() {
     setUrl(() => evt.target.value);
   };
 
-  const handleMakeAPICall = async () => {
+  const beginRequestProcessing = () => {
     setRequestState(() => ({
       status: 'pending'
     }));
@@ -159,7 +159,7 @@ export default function useRequest() {
 
   useEffect(() => {
     if (requestState.status === 'request') {
-      async function loadData(reqObject: AxiosRequestConfig) {
+      async function performRequest(reqObject: AxiosRequestConfig) {
         try {
           const data = await Axios(reqObject);
           setRequestState(() => ({
@@ -173,7 +173,7 @@ export default function useRequest() {
           }));
         }
       }
-      loadData(requestState.requestObject);
+      performRequest(requestState.requestObject);
     }
   }, [requestState, setRequestState]);
 
@@ -212,7 +212,7 @@ export default function useRequest() {
     handleDeleteParam,
     handleEditParam,
     handleEditHeaderItem,
-    handleMakeAPICall,
+    beginRequestProcessing,
     handleURLChange,
     handleAddHeader,
     handleAddParam,

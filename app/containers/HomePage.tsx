@@ -69,7 +69,7 @@ export default function HomePage() {
     handleDeleteParam,
     handleEditParam,
     handleEditHeaderItem,
-    handleMakeAPICall,
+    beginRequestProcessing,
     handleURLChange,
     handleAddHeader,
     handleAddParam,
@@ -104,7 +104,7 @@ export default function HomePage() {
           handleURLChange={handleURLChange}
           methods={methods}
           selectedMethod={selectedMethod}
-          handleMakeAPICall={handleMakeAPICall}
+          beginRequestProcessing={beginRequestProcessing}
           setSelectedMethod={setSelectedMethod}
         />
       </AppBar>
