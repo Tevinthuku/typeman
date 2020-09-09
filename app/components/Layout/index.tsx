@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core';
 
-import Lambda from '../components/LambdaIcon';
+import Lambda from '../LambdaIcon';
 
 const useStyles = makeStyles(() => ({
   title: {

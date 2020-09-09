@@ -109,7 +109,7 @@ export default function FieldsContainer({
                 <Grid
                   container
                   direction="row"
-                  justify="space-between"
+                  justify="center"
                   alignItems="center"
                 >
                   <Grid item>
@@ -125,14 +125,14 @@ export default function FieldsContainer({
                 </Grid>
               </TableCell>
             </TableRow>
-            {Object.values(items).map(row => (
-              <TableRow key={row.id}>
+            {Object.entries(items).map(([id, row]) => (
+              <TableRow key={id}>
                 <TableCell align="center">
                   <TextField
                     variant="outlined"
                     placeholder="Key"
                     value={row.key}
-                    onChange={handleEditKeyOrValue('key', row.id)}
+                    onChange={handleEditKeyOrValue('key', id)}
                     fullWidth
                   />
                 </TableCell>
@@ -143,14 +143,14 @@ export default function FieldsContainer({
                     placeholder="Value"
                     fullWidth
                     multiline
-                    onChange={handleEditKeyOrValue('value', row.id)}
+                    onChange={handleEditKeyOrValue('value', id)}
                   />
                 </TableCell>
                 <TableCell align="center">
                   <Grid
                     container
                     direction="row"
-                    justify="space-between"
+                    justify="center"
                     alignItems="center"
                   >
                     <Grid item>
@@ -158,7 +158,7 @@ export default function FieldsContainer({
                         size="small"
                         color="primary"
                         style={{ background: 'red' }}
-                        onClick={handleDeleteItem(row.id)}
+                        onClick={handleDeleteItem(id)}
                         aria-label="delete"
                       >
                         <DeleteIcon />

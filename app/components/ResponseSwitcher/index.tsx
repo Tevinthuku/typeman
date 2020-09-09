@@ -135,9 +135,6 @@ export default function ResponseSwitcher(props: Props) {
         message="Successfully copied to clipboard"
         action={
           <React.Fragment>
-            <Button color="secondary" size="small" onClick={handleClose}>
-              CLOSE
-            </Button>
             <IconButton
               size="small"
               aria-label="close"
@@ -189,7 +186,7 @@ export default function ResponseSwitcher(props: Props) {
                   props.requestState.status === 'Ok::Resolved') && (
                   <Button
                     onClick={handleCopyTypeData(
-                      props.transformState.typesToDisplay || ''
+                      props.transformState.typesToDisplay
                     )}
                     endIcon={<Copy />}
                   >
@@ -212,12 +209,8 @@ export default function ResponseSwitcher(props: Props) {
               </>
             )}
             {(props.requestState.status === 'pending' ||
-              props.requestState.status === 'request') && (
-              <div
-                style={{
-                  width: '100%'
-                }}
-              >
+              props.requestState.status === 'makeRequest') && (
+              <div className={classes.contentGridItem}>
                 <TabPanel value={value} index={0}>
                   <LoadingResults />
                 </TabPanel>

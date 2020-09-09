@@ -31,12 +31,12 @@ export default function ButtonGroupComponent({
   children,
   buttonGroupLabel
 }: Props) {
-  const [open, setOpen] = React.useState(false);
+  const [isMenuOpen, setMenuState] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
   const classes = useStyles();
   const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
+    setMenuState(prevOpen => !prevOpen);
   };
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
@@ -47,7 +47,7 @@ export default function ButtonGroupComponent({
       return;
     }
 
-    setOpen(false);
+    setMenuState(false);
   };
 
   return (
@@ -63,8 +63,8 @@ export default function ButtonGroupComponent({
           <Button
             color="primary"
             size="small"
-            aria-controls={open ? 'split-button-menu' : undefined}
-            aria-expanded={open ? 'true' : undefined}
+            aria-controls={isMenuOpen ? 'split-button-menu' : undefined}
+            aria-expanded={isMenuOpen ? 'true' : undefined}
             aria-label={buttonGroupLabel}
             aria-haspopup="menu"
             onClick={handleToggle}
@@ -74,7 +74,7 @@ export default function ButtonGroupComponent({
         </ButtonGroup>
         <div>
           <Popper
-            open={open}
+            open={isMenuOpen}
             anchorEl={anchorRef.current}
             className={classes.poper}
             role={undefined}
@@ -90,7 +90,7 @@ export default function ButtonGroupComponent({
               >
                 <Paper>
                   <ClickAwayListener onClickAway={handleClose}>
-                    {children(setOpen)}
+                    {children(setMenuState)}
                   </ClickAwayListener>
                 </Paper>
               </Grow>

@@ -5,7 +5,6 @@ export type IDObjectItem = {
   [S in string]: {
     key: string;
     value: string;
-    id: string;
   };
 };
 
