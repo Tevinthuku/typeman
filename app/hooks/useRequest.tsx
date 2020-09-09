@@ -32,7 +32,7 @@ export type requestStateMachine =
       status: 'pending';
     }
   | {
-      status: 'request';
+      status: 'makeRequest';
       requestObject: AxiosRequestConfig;
     }
   | requestResultState;
@@ -94,26 +94,29 @@ export default function useRequest() {
   const handleAddHeader = (header: HeaderType) => {
     setHeaders(draft => {
       const id = uuidv4();
-      draft[id] = {
-        ...header,
-        id: id
-      };
+      draft[id] = header;
     });
   };
 
   const handleAddParam = (param: HeaderType) => {
     setParams(draft => {
       const uniqueId = uuidv4();
-      draft[uniqueId] = {
-        ...param,
-        id: uniqueId
-      };
+      draft[uniqueId] = param;
     });
   };
 
   const handleURLChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     evt.persist();
     setUrl(() => evt.target.value);
+  };
+
+  const formatObjectItem = (object: IDObjectItem) => {
+    let result: { [a: string]: any } = {};
+    for (const item in object) {
+      const key = object[item].key;
+      result[key] = convertStringToNumberIfNecessary(object[item].value);
+    }
+    return result;
   };
 
   const beginRequestProcessing = () => {
@@ -129,36 +132,23 @@ export default function useRequest() {
     });
     const requestObject: AxiosRequestConfig = {
       url,
-      headers: {},
-      params: {},
+      headers: formatObjectItem(headers),
+      params: formatObjectItem(params),
       data: {}
     };
-    for (const header in headers) {
-      const key = headers[header].key;
-      requestObject.headers[key] = convertStringToNumberIfNecessary(
-        headers[header].value
-      );
-    }
-    for (const param in params) {
-      const key = params[param].key;
-      requestObject.params[key] = convertStringToNumberIfNecessary(
-        params[param].value
-      );
-    }
-
     try {
       requestObject.data = JSON.parse(body);
     } catch (err) {}
     requestObject.method = selectedMethod;
 
     setRequestState(() => ({
-      status: 'request',
+      status: 'makeRequest',
       requestObject
     }));
   };
 
   useEffect(() => {
-    if (requestState.status === 'request') {
+    if (requestState.status === 'makeRequest') {
       async function performRequest(reqObject: AxiosRequestConfig) {
         try {
           const data = await Axios(reqObject);

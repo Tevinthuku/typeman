@@ -9,26 +9,26 @@ import { ThemeProvider } from '@material-ui/core/styles';
 
 import LoadingWorkSpace from './components/LoadingWorkspace';
 
-import App from './containers/App';
+import AppLayout from './components/Layout';
 import routes from './constants/webroutes.json';
 import useTheme from './hooks/useTheme';
 
 import Landing from './containers/LandingPage';
 import { registerSW } from './sw';
 
-const Workspace = lazy(() => import('./containers/HomePage'));
+const Workspace = lazy(() => import('./containers/Workspace'));
 
 registerSW();
 function Routes() {
   return (
-    <App>
+    <AppLayout>
       <Switch>
         <Route exact path={routes.HOME} component={Landing} />
         <Suspense fallback={<LoadingWorkSpace />}>
           <Route path={routes.WORKSPACE} component={Workspace} />
         </Suspense>
       </Switch>
-    </App>
+    </AppLayout>
   );
 }
 

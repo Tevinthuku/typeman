@@ -65,7 +65,7 @@ export default function useTransform({
         }
       }
 
-      if (requestState.data && showDataOnly) {
+      if (showDataOnly) {
         const { status, data } = requestState.data;
         return { status, data };
       }

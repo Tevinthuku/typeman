@@ -44,12 +44,12 @@ export default function URLForm({
 }: URLFormProps) {
   const classes = useStyles();
 
-  const handleMenuItemClick = (
-    handleOpenMenu: React.Dispatch<React.SetStateAction<boolean>>,
+  const handleClickOnMethod = (
+    setMenuState: React.Dispatch<React.SetStateAction<boolean>>,
     method: Method
   ) => {
     setSelectedMethod(method);
-    handleOpenMenu(false);
+    setMenuState(false);
   };
 
   const handleSubmitRequestForm = (evt: FormEvent) => {
@@ -70,13 +70,13 @@ export default function URLForm({
           buttonGroupLabel="Select HTTP Method"
           itemSelected={selectedMethod}
         >
-          {handleClose => (
+          {setMenuState => (
             <MenuList id="split-button-menu">
               {methods.map(method => (
                 <MenuItem
                   key={method}
                   selected={selectedMethod === method}
-                  onClick={() => handleMenuItemClick(handleClose, method)}
+                  onClick={() => handleClickOnMethod(setMenuState, method)}
                 >
                   {method}
                 </MenuItem>

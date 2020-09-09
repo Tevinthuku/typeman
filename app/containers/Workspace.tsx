@@ -91,7 +91,7 @@ export default function HomePage() {
     setTransformPreset
   } = useTransform({
     requestState,
-    showDataOnly: Boolean(showDataOnly)
+    showDataOnly
   });
 
   const classes = useStyles();
