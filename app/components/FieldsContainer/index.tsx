@@ -88,6 +88,7 @@ export default function FieldsContainer({
             <TableRow>
               <TableCell align="center">
                 <TextField
+                  size="small"
                   variant="outlined"
                   placeholder="Key"
                   fullWidth
@@ -97,6 +98,7 @@ export default function FieldsContainer({
               </TableCell>
               <TableCell align="center">
                 <ValueInputComponent
+                  size="small"
                   variant="outlined"
                   onChange={handleChangeHeaderValue('value')}
                   fullWidth
@@ -129,6 +131,7 @@ export default function FieldsContainer({
               <TableRow key={id}>
                 <TableCell align="center">
                   <TextField
+                    size="small"
                     variant="outlined"
                     placeholder="Key"
                     value={row.key}
@@ -138,6 +141,7 @@ export default function FieldsContainer({
                 </TableCell>
                 <TableCell align="center">
                   <ValueInputComponent
+                    size="small"
                     variant="outlined"
                     value={row.value}
                     placeholder="Value"
