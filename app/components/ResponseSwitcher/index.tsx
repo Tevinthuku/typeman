@@ -11,8 +11,11 @@ import Copy from '@material-ui/icons/FileCopyOutlined';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import { AnimateSharedLayout, AnimatePresence, motion } from 'framer-motion';
+
 import Editor from '../Editor';
 import LoadingResults from '../Loading';
+import TabLabel from '../TabLabel';
 
 import {
   TransformStateMachine,
@@ -38,7 +41,16 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{children}</Box>}
+      {value === index && (
+        <motion.div
+          initial={{ y: 300, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -300, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Box p={3}>{children}</Box>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -113,17 +125,40 @@ export default function ResponseSwitcher(props: Props) {
 
   return (
     <div className={classes.root}>
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs example"
-        className={classes.tabs}
-      >
-        <Tab label="Types" {...a11yProps(0)} />
-        <Tab label="Data" {...a11yProps(1)} />
-      </Tabs>
+      <AnimateSharedLayout>
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={value}
+          TabIndicatorProps={{ hidden: true }}
+          onChange={handleChange}
+          aria-label="Vertical tabs example"
+          className={classes.tabs}
+        >
+          <Tab
+            disableRipple
+            label={
+              <TabLabel
+                layoutId="responseSwitch"
+                value="Types"
+                isSelected={value === 0}
+              />
+            }
+            {...a11yProps(0)}
+          />
+          <Tab
+            disableRipple
+            label={
+              <TabLabel
+                layoutId="responseSwitch"
+                value="Data"
+                isSelected={value === 1}
+              />
+            }
+            {...a11yProps(1)}
+          />
+        </Tabs>
+      </AnimateSharedLayout>
       <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
@@ -196,53 +231,55 @@ export default function ResponseSwitcher(props: Props) {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item className={classes.contentGridItem}>
-          <>
-            {props.requestState.status === 'idle' && (
-              <>
-                <TabPanel value={value} index={0}>
-                  <Editor value={''} handleChangeEditorValue={() => {}} />
-                </TabPanel>
-                <TabPanel value={value} index={1}>
-                  <Editor value={''} handleChangeEditorValue={() => {}} />
-                </TabPanel>
-              </>
-            )}
-            {(props.requestState.status === 'pending' ||
-              props.requestState.status === 'makeRequest') && (
-              <div className={classes.contentGridItem}>
-                <TabPanel value={value} index={0}>
-                  <LoadingResults />
-                </TabPanel>
-                <TabPanel value={value} index={1}>
-                  <LoadingResults />
-                </TabPanel>
-              </div>
-            )}
-            {props.transformState.status === 'transformed' &&
-              (props.requestState.status === 'Ok::Rejected' ||
-                props.requestState.status === 'Ok::Resolved') && (
+        <AnimatePresence>
+          <Grid item className={classes.contentGridItem}>
+            <>
+              {props.requestState.status === 'idle' && (
                 <>
                   <TabPanel value={value} index={0}>
-                    <Editor
-                      value={props.transformState.typesToDisplay || ''}
-                      handleChangeEditorValue={props.handleEditCode(
-                        'typeResponse'
-                      )}
-                    />
+                    <Editor value={''} handleChangeEditorValue={() => {}} />
                   </TabPanel>
                   <TabPanel value={value} index={1}>
-                    <Editor
-                      value={props.transformState.dataToDisplay || ''}
-                      handleChangeEditorValue={props.handleEditCode(
-                        'dataResponse'
-                      )}
-                    />
+                    <Editor value={''} handleChangeEditorValue={() => {}} />
                   </TabPanel>
                 </>
               )}
-          </>
-        </Grid>
+              {(props.requestState.status === 'pending' ||
+                props.requestState.status === 'makeRequest') && (
+                <div className={classes.contentGridItem}>
+                  <TabPanel value={value} index={0}>
+                    <LoadingResults />
+                  </TabPanel>
+                  <TabPanel value={value} index={1}>
+                    <LoadingResults />
+                  </TabPanel>
+                </div>
+              )}
+              {props.transformState.status === 'transformed' &&
+                (props.requestState.status === 'Ok::Rejected' ||
+                  props.requestState.status === 'Ok::Resolved') && (
+                  <>
+                    <TabPanel value={value} index={0}>
+                      <Editor
+                        value={props.transformState.typesToDisplay || ''}
+                        handleChangeEditorValue={props.handleEditCode(
+                          'typeResponse'
+                        )}
+                      />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                      <Editor
+                        value={props.transformState.dataToDisplay || ''}
+                        handleChangeEditorValue={props.handleEditCode(
+                          'dataResponse'
+                        )}
+                      />
+                    </TabPanel>
+                  </>
+                )}
+            </>
+          </Grid>
+        </AnimatePresence>
       </Grid>
     </div>
   );

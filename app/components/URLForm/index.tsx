@@ -88,6 +88,7 @@ export default function URLForm({
       <Grid item xs={6} md={8}>
         <form onSubmit={handleSubmitRequestForm}>
           <TextField
+            size="small"
             className={classes.input}
             fullWidth
             value={url}

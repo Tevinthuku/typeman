@@ -6,7 +6,10 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
+import { motion, AnimateSharedLayout, AnimatePresence } from 'framer-motion';
+
 import Headers from '../components/Header';
+import TabLabel from '../components/TabLabel';
 import Params from '../components/Params';
 import URLForm from '../components/URLForm';
 import Editor from '../components/Editor';
@@ -46,7 +49,16 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <>{children}</>}
+      {value === index && (
+        <motion.div
+          initial={{ x: 300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -300, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {children}
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -110,42 +122,78 @@ export default function HomePage() {
       </AppBar>
 
       <Paper square className={classes.tabsRoot}>
-        <Tabs
-          value={requestOption}
-          indicatorColor="primary"
-          textColor="inherit"
-          onChange={handleChange}
-          aria-label="select between header or params or the body editor"
-        >
-          <Tab label="Headers" {...a11yProps(0)} />
-          <Tab label="Params" {...a11yProps(1)} />
-          <Tab label="Body" {...a11yProps(2)} />
-        </Tabs>
+        <AnimateSharedLayout>
+          <Tabs
+            TabIndicatorProps={{
+              hidden: true
+            }}
+            value={requestOption}
+            textColor="inherit"
+            onChange={handleChange}
+            aria-label="select between header or params or the body editor"
+          >
+            <Tab
+              disableRipple
+              label={
+                <TabLabel
+                  layoutId="requestOptions"
+                  value="Headers"
+                  isSelected={requestOption === 0}
+                />
+              }
+              {...a11yProps(0)}
+            />
+            <Tab
+              disableRipple
+              label={
+                <TabLabel
+                  layoutId="requestOptions"
+                  value="Params"
+                  isSelected={requestOption === 1}
+                />
+              }
+              {...a11yProps(1)}
+            />
+            <Tab
+              disableRipple
+              label={
+                <TabLabel
+                  layoutId="requestOptions"
+                  value="Body"
+                  isSelected={requestOption === 2}
+                />
+              }
+              {...a11yProps(2)}
+            />
+          </Tabs>
+        </AnimateSharedLayout>
       </Paper>
-      <TabPanel value={requestOption} index={0}>
-        <Headers
-          handleDeleteHeader={handleDeleteHeader}
-          headers={headers}
-          handleEditHeaderItem={handleEditHeaderItem}
-          handleAddHeader={handleAddHeader}
-        />
-      </TabPanel>
-      <TabPanel value={requestOption} index={1}>
-        <Params
-          handleEditParam={handleEditParam}
-          handleAddParam={handleAddParam}
-          params={params}
-          handleDeleteParam={handleDeleteParam}
-        />
-      </TabPanel>
-      <TabPanel value={requestOption} index={2}>
-        <Editor
-          height="200px"
-          width="100vw"
-          value={body}
-          handleChangeEditorValue={setBody}
-        />
-      </TabPanel>
+      <AnimatePresence>
+        <TabPanel key={`simple-tabpanel-1`} value={requestOption} index={0}>
+          <Headers
+            handleDeleteHeader={handleDeleteHeader}
+            headers={headers}
+            handleEditHeaderItem={handleEditHeaderItem}
+            handleAddHeader={handleAddHeader}
+          />
+        </TabPanel>
+        <TabPanel key={`simple-tabpanel-2`} value={requestOption} index={1}>
+          <Params
+            handleEditParam={handleEditParam}
+            handleAddParam={handleAddParam}
+            params={params}
+            handleDeleteParam={handleDeleteParam}
+          />
+        </TabPanel>
+        <TabPanel key={`simple-tabpanel-3`} value={requestOption} index={2}>
+          <Editor
+            height="200px"
+            width="100vw"
+            value={body}
+            handleChangeEditorValue={setBody}
+          />
+        </TabPanel>
+      </AnimatePresence>
 
       <ResponseSwitcher
         showDataOnly={showDataOnly}
