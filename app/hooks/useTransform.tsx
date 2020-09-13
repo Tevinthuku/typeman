@@ -7,10 +7,6 @@ import useLocalStorage from './useLocalStorage';
 
 export type TransformationKeys = 'flow' | 'typescript' | 'kotlin';
 
-export type TransformPresetObject = {
-  to: TransformationKeys;
-};
-
 export type TransformStateMachine =
   | {
       status: 'pendingTransformation';
@@ -31,17 +27,16 @@ export default function useTransform({
   requestState,
   showDataOnly = true
 }: Props) {
-  const [transformTo, setTransformPreset] = useLocalStorage<
-    TransformPresetObject
-  >('transformPreset', {
-    to: 'flow'
-  });
+  const [transformTo, setTransformPreset] = useLocalStorage<TransformationKeys>(
+    'transformPreset',
+    'flow'
+  );
 
   const [transformState, setTransformState] = useImmer<TransformStateMachine>({
     status: 'pendingTransformation'
   });
 
-  const dataToBeTransformed = useCallback(
+  const formatFetchedData = useCallback(
     (requestState: requestResultState) => {
       if (requestState.status === 'Ok::Rejected') {
         if (requestState.error.response) {
@@ -57,8 +52,7 @@ export default function useTransform({
         } else {
           return {
             data: {
-              message:
-                requestState.error.message || 'net::ERR_INTERNET_DISCONNECTED'
+              message: requestState.error.message
             },
             status: 500
           };
@@ -75,27 +69,24 @@ export default function useTransform({
   );
 
   useEffect(() => {
-    async function performTransform() {
-      if (
-        requestState.status === 'Ok::Resolved' ||
-        requestState.status === 'Ok::Rejected'
-      ) {
-        const { data, status } = dataToBeTransformed(requestState);
-        if (transformTo.to === 'flow' || transformTo.to === 'typescript') {
-          setTransformState(() => ({
-            status: 'transformed',
-            statusCode: status,
-            typesToDisplay: json2ts(JSON.stringify(data || '', null, 2), {
-              flow: transformTo.to === 'flow',
-              prefix: ''
-            }),
-            dataToDisplay: JSON.stringify(data || '', null, 2)
-          }));
-        }
+    if (
+      requestState.status === 'Ok::Resolved' ||
+      requestState.status === 'Ok::Rejected'
+    ) {
+      const { data, status } = formatFetchedData(requestState);
+      if (transformTo === 'flow' || transformTo === 'typescript') {
+        setTransformState(() => ({
+          status: 'transformed',
+          statusCode: status,
+          typesToDisplay: json2ts(JSON.stringify(data || '', null, 2), {
+            flow: transformTo === 'flow',
+            prefix: ''
+          }),
+          dataToDisplay: JSON.stringify(data || '', null, 2)
+        }));
       }
     }
-    performTransform();
-  }, [requestState, transformTo, setTransformState, dataToBeTransformed]);
+  }, [requestState, transformTo, setTransformState, formatFetchedData]);
 
   const handleEditCode = (type: 'dataResponse' | 'typeResponse') => (
     code: string

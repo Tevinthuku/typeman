@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Axios, { Method, AxiosError, AxiosRequestConfig } from 'axios';
+import Axios, {
+  Method,
+  AxiosError,
+  AxiosResponse,
+  AxiosRequestConfig
+} from 'axios';
 import { useImmer } from 'use-immer';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,17 +12,12 @@ import useLocalStorage from './useLocalStorage';
 
 import { IDObjectItem, HeaderType, AxiosHeaderParamType } from '../types/data';
 
-const initialHeaders: IDObjectItem = {};
-
 export const methods: Method[] = ['GET', 'POST', 'DELETE', 'PUT'];
 
 export type requestResultState =
   | {
       status: 'Ok::Resolved';
-      data: {
-        status: number;
-        data: Object;
-      };
+      data: AxiosResponse<Object>;
     }
   | {
       status: 'Ok::Rejected';
@@ -37,7 +37,7 @@ export type requestStateMachine =
     }
   | requestResultState;
 
-type AxiosParamsLocalStorageParams = {
+type AxiosLocalStorageParams = {
   url: string;
   headers: IDObjectItem;
   params: IDObjectItem;
@@ -57,18 +57,18 @@ function convertStringToNumberIfNecessary(str: string): string | number {
   }
 }
 
-const initialAxiosParamsLocalStorageParams = {
+const initialAxiosLocalStorageParams = {
   url: 'https://jsonplaceholder.typicode.com/posts/1',
-  headers: initialHeaders,
-  params: initialHeaders,
+  headers: {},
+  params: {},
   body: '',
   selectedMethod: methods[0]
 };
 
 export default function useRequest() {
   const [axioslocalStorageParams, setLocalStorageAxiosParams] = useLocalStorage<
-    AxiosParamsLocalStorageParams
-  >('axiosParams', initialAxiosParamsLocalStorageParams);
+    AxiosLocalStorageParams
+  >('axiosParams', initialAxiosLocalStorageParams);
 
   const [headers, setHeaders] = useImmer<IDObjectItem>(
     axioslocalStorageParams.headers
@@ -78,17 +78,20 @@ export default function useRequest() {
   );
   const [body, setBody] = useState(axioslocalStorageParams.body);
   const [url, setUrl] = useState(axioslocalStorageParams.url);
-  const [selectedMethod, setSelectedMethod] = React.useState(
+  const [selectedMethod, setSelectedMethod] = useState(
     axioslocalStorageParams.selectedMethod
   );
 
   const [requestState, setRequestState] = useImmer<requestStateMachine>(
     initialRequestState
   );
-  const [requestOption, setRequestOption] = useState(0);
+  const [requestConfigView, setRequestConfigView] = useState(0);
 
-  const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
-    setRequestOption(newValue);
+  const handleChangeRequestConfigView = (
+    _event: React.ChangeEvent<{}>,
+    newValue: number
+  ) => {
+    setRequestConfigView(newValue);
   };
 
   const handleAddHeader = (header: HeaderType) => {
@@ -197,7 +200,7 @@ export default function useRequest() {
   };
 
   return {
-    handleChange,
+    handleChangeRequestConfigView,
     handleDeleteHeader,
     handleDeleteParam,
     handleEditParam,
@@ -208,7 +211,7 @@ export default function useRequest() {
     handleAddParam,
     setBody,
     setSelectedMethod,
-    requestOption,
+    requestConfigView,
     headers,
     params,
     body,

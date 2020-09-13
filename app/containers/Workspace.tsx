@@ -76,7 +76,7 @@ export default function HomePage() {
     false
   );
   const {
-    handleChange,
+    handleChangeRequestConfigView,
     handleDeleteHeader,
     handleDeleteParam,
     handleEditParam,
@@ -87,7 +87,7 @@ export default function HomePage() {
     handleAddParam,
     setBody,
     setSelectedMethod,
-    requestOption,
+    requestConfigView,
     headers,
     params,
     body,
@@ -127,18 +127,18 @@ export default function HomePage() {
             TabIndicatorProps={{
               hidden: true
             }}
-            value={requestOption}
+            value={requestConfigView}
             textColor="inherit"
-            onChange={handleChange}
+            onChange={handleChangeRequestConfigView}
             aria-label="select between header or params or the body editor"
           >
             <Tab
               disableRipple
               label={
                 <TabLabel
-                  layoutId="requestOptions"
+                  layoutId="requestConfigView"
                   value="Headers"
-                  isSelected={requestOption === 0}
+                  isSelected={requestConfigView === 0}
                 />
               }
               {...a11yProps(0)}
@@ -147,9 +147,9 @@ export default function HomePage() {
               disableRipple
               label={
                 <TabLabel
-                  layoutId="requestOptions"
+                  layoutId="requestConfigView"
                   value="Params"
-                  isSelected={requestOption === 1}
+                  isSelected={requestConfigView === 1}
                 />
               }
               {...a11yProps(1)}
@@ -158,9 +158,9 @@ export default function HomePage() {
               disableRipple
               label={
                 <TabLabel
-                  layoutId="requestOptions"
+                  layoutId="requestConfigView"
                   value="Body"
-                  isSelected={requestOption === 2}
+                  isSelected={requestConfigView === 2}
                 />
               }
               {...a11yProps(2)}
@@ -169,7 +169,7 @@ export default function HomePage() {
         </AnimateSharedLayout>
       </Paper>
       <AnimatePresence>
-        <TabPanel key={`simple-tabpanel-1`} value={requestOption} index={0}>
+        <TabPanel key={`simple-tabpanel-1`} value={requestConfigView} index={0}>
           <Headers
             handleDeleteHeader={handleDeleteHeader}
             headers={headers}
@@ -177,7 +177,7 @@ export default function HomePage() {
             handleAddHeader={handleAddHeader}
           />
         </TabPanel>
-        <TabPanel key={`simple-tabpanel-2`} value={requestOption} index={1}>
+        <TabPanel key={`simple-tabpanel-2`} value={requestConfigView} index={1}>
           <Params
             handleEditParam={handleEditParam}
             handleAddParam={handleAddParam}
@@ -185,7 +185,7 @@ export default function HomePage() {
             handleDeleteParam={handleDeleteParam}
           />
         </TabPanel>
-        <TabPanel key={`simple-tabpanel-3`} value={requestOption} index={2}>
+        <TabPanel key={`simple-tabpanel-3`} value={requestConfigView} index={2}>
           <Editor
             height="200px"
             width="100vw"

@@ -19,7 +19,7 @@ import TabLabel from '../TabLabel';
 
 import {
   TransformStateMachine,
-  TransformPresetObject
+  TransformationKeys
 } from '../../hooks/useTransform';
 import { requestStateMachine } from '../../hooks/useRequest';
 import TransformPresetSelector from '../TransformPresetSelector';
@@ -90,8 +90,8 @@ type Props = {
   requestState: requestStateMachine;
   setShowDataOnly: (s: boolean) => void;
   showDataOnly: boolean | void | null;
-  transformTo: TransformPresetObject;
-  setTransformPreset: (t: TransformPresetObject) => void;
+  transformTo: TransformationKeys;
+  setTransformPreset: (t: TransformationKeys) => void;
 };
 
 export default function ResponseSwitcher(props: Props) {
