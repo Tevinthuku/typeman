@@ -11,10 +11,7 @@ import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Settings from '@material-ui/icons/Settings';
 
-import {
-  TransformationKeys,
-  TransformPresetObject
-} from '../../hooks/useTransform';
+import { TransformationKeys } from '../../hooks/useTransform';
 
 const options: TransformationKeys[] = ['flow', 'typescript'];
 
@@ -28,8 +25,8 @@ export interface ConfirmationDialogRawProps {
 }
 
 type Props = {
-  transformTo: TransformPresetObject;
-  setTransformPreset: (t: TransformPresetObject) => void;
+  transformTo: TransformationKeys;
+  setTransformPreset: (t: TransformationKeys) => void;
 };
 
 function ConfirmationDialogRaw(props: ConfirmationDialogRawProps) {
@@ -118,14 +115,14 @@ export default function ConfirmationDialog(props: Props) {
   const handleClose = (newValue?: TransformationKeys) => {
     setOpen(false);
     if (newValue) {
-      props.setTransformPreset({ to: newValue });
+      props.setTransformPreset(newValue);
     }
   };
 
   return (
     <div>
       <Button onClick={handleClickListItem} endIcon={<Settings />}>
-        {props.transformTo.to}
+        {props.transformTo}
       </Button>
       <ConfirmationDialogRaw
         classes={{
@@ -135,7 +132,7 @@ export default function ConfirmationDialog(props: Props) {
         keepMounted
         open={open}
         onClose={handleClose}
-        value={props.transformTo.to}
+        value={props.transformTo}
       />
     </div>
   );
